@@ -139,9 +139,9 @@ class LazyCFR:
         # self.init()
         # print("INIT DONE")
         b0 = generateChildren(game, self.stgy, 0)
-        print("CHILDREN0:", b0)
+        # print("CHILDREN0:", b0)
         b1 = generateChildren(game, self.stgy, 1)
-        print("CHILDREN1:", b1)
+        # print("CHILDREN1:", b1)
         self.game.childrenInfosets[0] = b0
         self.game.childrenInfosets[1] = b1
 
