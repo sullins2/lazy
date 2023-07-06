@@ -49,7 +49,7 @@ if args.Type:
 # LAZY FLBR -0.001 around 21-22.5m
 # LAZY FLBR with ANY thres doesn't work yet for betm=4
 
-print(algo, Type, savepath)
+# print(algo, Type, savepath)
 
 # This is for all Leduc
 if betm>7:

@@ -217,7 +217,7 @@ def updateB(game, stgy_prof, p):
 def generateOutcome(game, stgy_prof):
 	outcome = np.zeros(game.numHists).tolist()
 	rew = np.zeros(game.numHists)
-	print("GENERATE OUTCOME")
+	print("GENERATE OUTCOME() called")
 	def solve(hist):
 		# all this does is returns the reward
 		if game.isTerminal[hist]:
@@ -249,10 +249,10 @@ def generateOutcome(game, stgy_prof):
 		return rew[hist]						 # return that value
 
 	solve(0)
-	print("Here")
-	print(outcome[0], rew[0])
-	print("OUTCOME")
-	print(outcome)
+	# print("Here")
+	# print(outcome[0], rew[0])
+	# print("OUTCOME")
+	# print(outcome)
 	return outcome, rew
 
 def generateOutcomeFinal(game, stgy_prof):
