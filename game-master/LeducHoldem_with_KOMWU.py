@@ -102,10 +102,10 @@ class Game:
                 player=2):
         x, y = parhists.shape
 
-        print("******************************")
-        print("PLAYER: ", player, " DEPTH: ", depth, " x: ", x, " y: ", y)
-        print("******************************")
-        # print("CARDS: ", self.cards)
+        # print("******************************")
+        # print("PLAYER: ", player, " DEPTH: ", depth, " x: ", x, " y: ", y)
+        # print("******************************")
+        # # print("CARDS: ", self.cards)
 
         histids = np.ones((x, y))
         isetids = [np.ones(x), np.ones(y)]
@@ -118,18 +118,18 @@ class Game:
         elif privatecard[1][0][0] == -1:  # second iteration
             obs[0] = False
 
-        print("OBS: ", obs)
+        # print("OBS: ", obs)
 
         def genNactsOnHist():
             if isTerminal:
                 return 0
             if player == 2:
-                # print("Numacts on hist (player 2):", int(self.cards))
+                # # print("Numacts on hist (player 2):", int(self.cards))
                 return int(self.cards)
             if bids[1 - player] == -1:
-                # print("Numacts on hist: (bids -1)", self.bidmaximum + 1)
+                # # print("Numacts on hist: (bids -1)", self.bidmaximum + 1)
                 return int(self.bidmaximum + 1)  # pretty sure this means bet 1 or check
-            # print("Numacts on hist: (OTHER)", 2 + int(self.bidmaximum - bids[1 - player]))
+            # # print("Numacts on hist: (OTHER)", 2 + int(self.bidmaximum - bids[1 - player]))
             return 2 + int(self.bidmaximum - bids[1 - player])  # call, fold or raise amount left?
 
         def genNactsOnIset(owner):
@@ -149,31 +149,31 @@ class Game:
             totseqs1 = None
 
 
-        # print("isTerminal", isTerminal, "privatecard", privatecard, "publiccard", publiccard, "bids", bids, "quit", quit, "obs", obs)
+        # # print("isTerminal", isTerminal, "privatecard", privatecard, "publiccard", publiccard, "bids", bids, "quit", quit, "obs", obs)
 
         for i in range(x):
-            print("FOR X")
+            # print("FOR X")
             self.isetSucc[0].append([])
             self.isetPar[0].append(0)
             self.playerOfIset[0].append(0)
             self.nactsOnIset[0].append(0)
             self.Iset2Hists[0].append(0)
             isetids[0][i] = int(self.numIsets[0])
-            print("isetid: ", isetids[0][i])
+            # print("isetid: ", isetids[0][i])
             self.isetPar[0][self.numIsets[0]] = (int(parisets[0][i]), int(iacts[0][i]))
-            print("isetPar: ", self.isetPar[0][self.numIsets[0]])
+            # print("isetPar: ", self.isetPar[0][self.numIsets[0]])
             self.playerOfIset[0][self.numIsets[0]] = player
-            print("playerOfIset: ", player)
+            # print("playerOfIset: ", player)
 
             self.nactsOnIset[0][self.numIsets[0]] = genNactsOnIset(0)
-            print(" x acts: ", self.nactsOnIset[0][self.numIsets[0]])
+            # print(" x acts: ", self.nactsOnIset[0][self.numIsets[0]])
 
             ##### KOMWU
             seqs0 = []
             if player == 0:
-                print("Here would have lastparseq0: ", lastparseq0)
+                # print("Here would have lastparseq0: ", lastparseq0)
                 if lastparseq0 is not None:
-                    print("Setting parSeq to be: ", lastparseq0[i])
+                    # print("Setting parSeq to be: ", lastparseq0[i])
                     self.parSeq[0][self.numIsets[0]] = lastparseq0[i]
                 self.infoSets[0].append(self.numIsets[0])  # self.numInfoSets[0]) # create the infoset
                 for ii in range(1, genNactsOnIset(0) + 1):
@@ -185,45 +185,45 @@ class Game:
             ####################################
 
             if parisets[0][i] >= 0:
-                print("isetSucc for 0. pariset:", int(parisets[0][i]), " has successor:",int(isetids[0][i]))
+                # print("isetSucc for 0. pariset:", int(parisets[0][i]), " has successor:",int(isetids[0][i]))
                 self.isetSucc[0][int(parisets[0][i])].append(int(isetids[0][i]))
 
-            print("Would have been using lastparseq0:", lastparseq0)
+            # print("Would have been using lastparseq0:", lastparseq0)
             if parisets[0][i] >= 0 and lastchance == False:
                 if int(parisets[0][i]) not in self.isetSuccSeq[0] and int(parisets[0][i]) is not None:
                     self.isetSuccSeq[0][int(parisets[0][i])] = {}
                 if int(parisets[0][i]) is not None and int(isetids[0][i]) is not None:
                     if lastparseq0 is not None and lastchance == False:
-                        print("LASTCHANCE:", lastchance, " lastparseq0:", lastparseq0[i])
-                        print("pariset:", int(parisets[0][i]), " isetids:", int(isetids[0][i]))
+                        # # print("LASTCHANCE:", lastchance, " lastparseq0:", lastparseq0[i])
+                        # # print("pariset:", int(parisets[0][i]), " isetids:", int(isetids[0][i]))
                         self.isetSuccSeq[0][int(parisets[0][i])][int(isetids[0][i])] = lastparseq0[i]
 
             self.numIsets[0] += 1
 
         for i in range(y):
-            print("FOR Y")
+            # # print("FOR Y")
             self.isetSucc[1].append([])
             self.isetPar[1].append(0)
             self.playerOfIset[1].append(0)
             self.nactsOnIset[1].append(0)
             self.Iset2Hists[1].append(0)
             isetids[1][i] = int(self.numIsets[1])
-            print("isetids: ", isetids[1][i])
+            # # print("isetids: ", isetids[1][i])
             self.isetPar[1][self.numIsets[1]] = (int(parisets[1][i]), int(iacts[1][i]))
-            print("isetPar: ", self.isetPar[1][self.numIsets[1]])
+            # # print("isetPar: ", self.isetPar[1][self.numIsets[1]])
             self.playerOfIset[1][self.numIsets[1]] = player
-            print("playerOfIset: ", player)
+            # # print("playerOfIset: ", player)
 
             self.nactsOnIset[1][self.numIsets[1]] = genNactsOnIset(1)
-            # print("  y acts: ", self.nactsOnIset[1][self.numIsets[1]])
+            # # # print("  y acts: ", self.nactsOnIset[1][self.numIsets[1]])
 
             ################# KOMWU
             seqs1 = []
             # nxtpars1 = []
             if player == 1:
                 if lastparseq1 is not None:
-                    # print(lastparseq1)
-                    print("Setting parSeq to be: ", lastparseq1[i])
+                    # # # print(lastparseq1)
+                    # # print("Setting parSeq to be: ", lastparseq1[i])
                     self.parSeq[1][self.numIsets[1]] = lastparseq1[i]
                 self.infoSets[1].append(self.numIsets[1])  # self.numInfoSets[1])  # create the infoset
 
@@ -237,21 +237,21 @@ class Game:
             #################
 
             if parisets[1][i] >= 0:
-                print("isetSucc for 1. pariset:", int(parisets[1][i]), " has successor:", int(isetids[1][i]))
+                # # print("isetSucc for 1. pariset:", int(parisets[1][i]), " has successor:", int(isetids[1][i]))
                 self.isetSucc[1][int(parisets[1][i])].append(int(isetids[1][i]))
 
-            print("Would have been using lastparseq1:", lastparseq1)
+            # # print("Would have been using lastparseq1:", lastparseq1)
             if parisets_chance[1][i] >= 0 and lastchance == False:
                 if int(parisets_chance[1][i]) not in self.isetSuccSeq[1] and int(parisets_chance[1][i]) is not None:
                     self.isetSuccSeq[1][int(parisets_chance[1][i])] = {}
                 if int(parisets_chance[1][i]) is not None and int(isetids[1][i]) is not None:
                     if lastparseq1 is not None:
-                        print("LASTCHANCE:", lastchance, " lastparseq0:", lastparseq1[i])
-                        print("pariset:", int(parisets[1][i]), " isetids:", int(isetids[1][i]))
+                        # # print("LASTCHANCE:", lastchance, " lastparseq0:", lastparseq1[i])
+                        # # print("pariset:", int(parisets[1][i]), " isetids:", int(isetids[1][i]))
                         self.isetSuccSeq[1][int(parisets_chance[1][i])][int(isetids[1][i])] = lastparseq1[i]
             self.numIsets[1] += 1
 
-        # print("HISTORIES")
+        # # # print("HISTORIES")
         for i in range(x):
             for j in range(y):
                 self.isTerminal.append(False)
@@ -264,20 +264,20 @@ class Game:
                 self.Hist2Iset[0].append(0)
                 self.Hist2Iset[1].append(0)
                 histids[i][j] = int(self.numHists)
-                # print("histids: ", histids[i][j])
+                # # print("histids: ", histids[i][j])
                 self.histPar[self.numHists] = (int(parhists[i][j]), int(hacts[i][j]))
-                # print("histPar: ", self.histPar[self.numHists])
+                # # print("histPar: ", self.histPar[self.numHists])
                 self.playerOfHist[self.numHists] = player
-                # print("playerOfHis: ", player)
+                # # print("playerOfHis: ", player)
                 self.isTerminal[self.numHists] = isTerminal
                 self.Hist2Iset[0][self.numHists] = int(isetids[0][i])
-                # print("Hist2Iset[0]: ", int(isetids[0][i]))
+                # # print("Hist2Iset[0]: ", int(isetids[0][i]))
                 self.Hist2Iset[1][self.numHists] = int(isetids[1][j])
-                # print("Hist2Iset[1]: ", int(isetids[1][j]))
+                # # print("Hist2Iset[1]: ", int(isetids[1][j]))
 
                 if player == 2:
                     if privatecard[0][i][j] == -1:
-                        # print("Setting chance prob to: ", np.ones(self.cards) / self.cards)
+                        # # print("Setting chance prob to: ", np.ones(self.cards) / self.cards)
                         self.chanceprob.append(np.ones(self.cards) / self.cards)
 
                     elif privatecard[1][i][j] == -1:
@@ -285,10 +285,10 @@ class Game:
                         for _a in range(self.cards):
                             if _a == int(privatecard[0][i][j]):
                                 self.chanceprob[int(self.numHists)][_a] = 1.0 / (2 * self.cards - 1)
-                            # print("Setting chance prob to: ", 1.0/(2 * self.cards - 1))
+                            # # print("Setting chance prob to: ", 1.0/(2 * self.cards - 1))
                             else:
                                 self.chanceprob[int(self.numHists)][_a] = 2.0 / (2 * self.cards - 1)
-                            # print("Setting chance prob to: ", 2.0/(2 * self.cards - 1))
+                            # # print("Setting chance prob to: ", 2.0/(2 * self.cards - 1))
                     else:
                         self.chanceprob.append(np.ones(self.cards))
                         for _a in range(self.cards):
@@ -308,18 +308,18 @@ class Game:
                     self.nactsOnHist[self.numHists] = 1 - (self.bidmaximum - bids[1 - player])
                 """
                 self.nactsOnHist[self.numHists] = genNactsOnHist()
-                # print("nactsOnHist: ", self.nactsOnHist[self.numHists])
+                # # print("nactsOnHist: ", self.nactsOnHist[self.numHists])
                 if parhists[i][j] >= 0:
                     self.histSucc[int(parhists[i][j])].append(int(histids[i][j]))
-                # print("Setting parhist: ", parhists[i][j], " to have histSucc: ", int(histids[i][j]))
+                # # print("Setting parhist: ", parhists[i][j], " to have histSucc: ", int(histids[i][j]))
                 self.numHists += 1
 
         for i in range(x):
             self.Iset2Hists[0][int(isetids[0][i])] = histids[i, :].astype(int)
-        # print("Iset2Hists[0] for isetids::", int(isetids[0][i]), " is ", histids[i, :].astype(int))
+        # # print("Iset2Hists[0] for isetids::", int(isetids[0][i]), " is ", histids[i, :].astype(int))
         for i in range(y):
             self.Iset2Hists[1][int(isetids[1][i])] = histids[:, i].astype(int)
-        # print("Iset2Hists[1] for isetids::", int(isetids[1][i]), " is ", histids[:, i].astype(int))
+        # # print("Iset2Hists[1] for isetids::", int(isetids[1][i]), " is ", histids[:, i].astype(int))
 
         if isTerminal == True:
             for i in range(x):
@@ -345,91 +345,91 @@ class Game:
                         self.reward[int(histids[i][j])] = (bids[1] + 0.5, -bids[1] - 0.5)
                     elif win == -1:
                         self.reward[int(histids[i][j])] = (-bids[0] - 1, bids[0] + 1)
-                # print("Just set a terminal")
+                # # print("Just set a terminal")
             return  # histids, isetids
 
         if obs[0] == False:
-            print("obs[0] == False")
+            # print("obs[0] == False")
             nxtparhist = np.zeros((x, 0))
-            print("nxtparhist: ", nxtparhist)
+            # print("nxtparhist: ", nxtparhist)
             nxthacts = np.zeros((x, 0))
-            print("nxthacts: ", nxthacts)
+            # print("nxthacts: ", nxthacts)
             nxtpariset = [isetids[0].copy(), np.zeros(0)]
             nxtpariset_chance = [np.zeros_like(isetids[0]), np.zeros(0)]
-            print("nxtpariset: ", nxtpariset)
+            # print("nxtpariset: ", nxtpariset)
             nxtiacts = [np.zeros(x), np.zeros(0)]
-            print("nxtiacts: ", nxtiacts)
+            # print("nxtiacts: ", nxtiacts)
 
             nxtprivatecard = np.zeros((2, x, 0))
             nxtpubliccard = -1
             nxtbid = -1 * np.ones(2)
             nxtquit = np.zeros(2)
 
-            print("Looping over self.cards: ", self.cards)
+            # print("Looping over self.cards: ", self.cards)
             for i in range(self.cards):
                 nxtparhist = np.concatenate((nxtparhist, histids), axis=1)
-                print("nxtparhist: ", nxtparhist)
+                # print("nxtparhist: ", nxtparhist)
                 nxthacts = np.concatenate((nxthacts, i * np.ones((x, y))), axis=1)
-                print("nxthacts: ", nxthacts)
+                # print("nxthacts: ", nxthacts)
                 nxtpariset[1] = np.concatenate((nxtpariset[1], isetids[1]))
                 nxtpariset_chance[1] = np.concatenate((nxtpariset_chance[1], np.zeros_like(isetids[1])))
-                print("nxtpariset[1]: ", nxtpariset[1])
+                # print("nxtpariset[1]: ", nxtpariset[1])
                 nxtiacts[1] = np.concatenate((nxtiacts[1], i * np.ones(y)))
-                print("nxtiacts[1]: ", nxtiacts[1])
+                # print("nxtiacts[1]: ", nxtiacts[1])
 
                 tmpprivate0 = privatecard[0, :, :]
                 tmpprivate1 = i * np.ones((x, y))
                 tmpprivate = np.array((tmpprivate0, tmpprivate1))
                 nxtprivatecard = np.concatenate((nxtprivatecard, tmpprivate), axis=2)
-                print("nxtprivatecard: ", nxtprivatecard)
+                # print("nxtprivatecard: ", nxtprivatecard)
 
-            # print("CAL WITH: ", depth)
+            # # print("CAL WITH: ", depth)
             self.genGame(nxtparhist, nxthacts, nxtpariset, nxtiacts, depth + 1, nxtprivatecard, nxtpubliccard, nxtbid,
                          nxtquit, np.array([-1, -1]), np.array([-1, -1]), None, None, True,nxtpariset_chance, isTerminal=False, player=0)
 
         elif obs[1] == False:
 
-            print("obs[1] == False")
+            # print("obs[1] == False")
             nxtparhist = np.zeros((0, y))
-            print("nxtparhist: ", nxtparhist)
+            # print("nxtparhist: ", nxtparhist)
             nxthacts = np.zeros((0, y))
-            print("nxthacts: ", nxthacts)
+            # print("nxthacts: ", nxthacts)
             nxtpariset = [np.zeros(0), isetids[1].copy()]
             nxtpariset_chance = [np.zeros(0), np.zeros_like(isetids[1])]
-            print("nxtpariset: ", nxtpariset)
+            # print("nxtpariset: ", nxtpariset)
             nxtiacts = [np.zeros(0), np.zeros(y)]
-            print("nxtiacts: ", nxtiacts)
+            # print("nxtiacts: ", nxtiacts)
 
             nxtprivatecard = np.zeros((2, 0, y))
-            print("nxtprivatecard: ", nxtprivatecard)
+            # print("nxtprivatecard: ", nxtprivatecard)
             nxtpubliccard = -1
             nxtbid = -1 * np.ones(2)
             nxtquit = np.zeros(2)
 
-            print("Looping over self.cards: ", self.cards)
+            # print("Looping over self.cards: ", self.cards)
             for i in range(self.cards):
                 nxtparhist = np.concatenate((nxtparhist, histids), axis=0)
-                print("nxtparhist: ", nxtparhist)
+                # print("nxtparhist: ", nxtparhist)
                 nxthacts = np.concatenate((nxthacts, i * np.ones((x, y))), axis=0)
-                print("nxthacts: ", nxthacts)
+                # print("nxthacts: ", nxthacts)
                 nxtpariset[0] = np.concatenate((nxtpariset[0], isetids[0]))
                 nxtpariset_chance[0] = np.concatenate((nxtpariset_chance[0], np.zeros_like(isetids[0])))
-                print("nxtpariset[0]: ", nxtpariset[0])
+                # print("nxtpariset[0]: ", nxtpariset[0])
                 nxtiacts[0] = np.concatenate((nxtiacts[0], i * np.ones(x)))
-                print("nxtiacts[0]: ", nxtiacts[0])
+                # print("nxtiacts[0]: ", nxtiacts[0])
 
                 tmpprivate1 = privatecard[1, :, :]
                 tmpprivate0 = i * np.ones((x, y))
                 tmpprivate = np.array((tmpprivate0, tmpprivate1))
                 nxtprivatecard = np.concatenate((nxtprivatecard, tmpprivate), axis=1)
-                print("nxtprivatecard: ", nxtprivatecard)
+                # print("nxtprivatecard: ", nxtprivatecard)
 
             self.genGame(nxtparhist, nxthacts, nxtpariset, nxtiacts, depth + 1, nxtprivatecard, nxtpubliccard, nxtbid,
                          nxtquit, np.array([-1, -1]), np.array([-1, -1]), None, None, True, nxtpariset_chance, isTerminal=False, player=2)
 
         else:
             nacts = genNactsOnHist()
-            print("Player: ", player, " nacts: ", nacts, " depth: ", depth)
+            # print("Player: ", player, " nacts: ", nacts, " depth: ", depth)
             for i in range(nacts):
                 nxtparhist = histids.copy()
                 nxthacts = i * np.ones((x, y))
@@ -458,19 +458,19 @@ class Game:
                     nxtpubliccard = publiccard
 
                 nxtbid = bids.copy()
-                print("bids: ", bids)
+                # print("bids: ", bids)
                 if player != 2 and i != nacts - 1:
-                    print("i != nacts-1")
+                    # print("i != nacts-1")
                     if nxtbid[1 - player] == -1:
                         nxtbid[player] = i + 1  # This should be without + 1 so that checks are enabled
-                        print(" nxtbid[1-player] == -1 ", nxtbid[player])
+                        # print(" nxtbid[1-player] == -1 ", nxtbid[player])
                     else:
                         nxtbid[player] = nxtbid[1 - player] + i
-                        print(" nxtbid[1-player] != -1 ", nxtbid[player])
+                        # print(" nxtbid[1-player] != -1 ", nxtbid[player])
                 nxtquit = quit.copy()
                 # This makes the last action a fold.
                 if player != 2 and i == nacts - 1:
-                    print("i == nacts-1")
+                    # print("i == nacts-1")
                     nxtquit[player] = 1
                     if bids[player] == -1:  # does this make it a check?
                         bids[player] = 0
@@ -482,7 +482,7 @@ class Game:
                     nxtplayer = 0
                 elif nxtquit[0] or nxtquit[1]:
                     nxtisTerminal = True
-                    print("nxtisTerminal == True")
+                    # print("nxtisTerminal == True")
                     nxtplayer = 2
                 elif bids[0] == nxtbid[0] and bids[1] == nxtbid[1]:
                     nxtplayer = 2
@@ -490,11 +490,11 @@ class Game:
                         nxtisTerminal = False
                     else:
                         nxtisTerminal = True
-                        print("one of bids and nxtbids are equal:")
-                        print("  0: ", bids[0], nxtbid[0])
-                        print("  1: ", bids[1], nxtbid[1])
+                        # print("one of bids and nxtbids are equal:")
+                        # print("  0: ", bids[0], nxtbid[0])
+                        # print("  1: ", bids[1], nxtbid[1])
                 else:
-                    print("nxtisTerminal = False, going on with next player")
+                    # print("nxtisTerminal = False, going on with next player")
                     nxtisTerminal = False
                     nxtplayer = 1 - player
 
@@ -503,11 +503,11 @@ class Game:
                 else:
                     nxtlastchance = False
 
-                # print("CAL WITH: ", depth)
+                # # print("CAL WITH: ", depth)
                 self.genGame(nxtparhist, nxthacts, nxtpariset, nxtiacts, depth + 1, nxtprivatecard, nxtpubliccard,
                              nxtbid, nxtquit, nxtlastpar, nxtlastseq, nxtparseq0, nxtparseq1, nxtlastchance, nxtpariset_chance, isTerminal=nxtisTerminal, player=nxtplayer)
 
 # for i in range(5, 11):
 #	game = Game(bidmaximum=i)
-#	print(i, int(time.time()) % 100000, game.numHists)
-# game.printGame()
+#	# print(i, int(time.time()) % 100000, game.numHists)
+# game.# printGame()
