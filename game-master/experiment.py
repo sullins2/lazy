@@ -55,7 +55,7 @@ print(algo, Type, savepath)
 if betm>7:
 	game = Game(path=savepath+".npz")
 else:
-	betm = 3
+	betm = 6
 	game = Game( bidmaximum =betm) #path=savepath+".npz")#bidmaximum=betmpath=
 
 # This is for Kuhn
@@ -94,11 +94,10 @@ reporttimes=[10, 10, 10, 10, 10, 20, 60, 100, 200, 300, 600, 500]
 printround=[10000, 8000, 6000, 4000, 2000, 100, 50, 200, 100, 50, 1, 1]
 
 # CHECK EXPLOITABILITY CALC CODE
-# LEN OF VISITED: 222 102
 
 def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 	# thres = -0.0045 #5  # Lazy-CFR uses 0.1 for larger games
-	thres = -0.007
+	thres = 0.007
 	def solve(gamesolver, reporttime=60, timelim = 30000, minimum=0):
 		expl_plot = []
 		expl_iters = []

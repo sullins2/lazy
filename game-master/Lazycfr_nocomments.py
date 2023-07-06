@@ -9,7 +9,6 @@ from scipy.special import logsumexp
 
 
 class LazyCFR:
-    test = 1
     def __init__(self, game, Type="regretmatching", thres=0.0):
         print("initializing solver")
         self.thres = thres
@@ -289,7 +288,7 @@ class LazyCFR:
         # TODO WRITE CODE TO CALCULATE THE ENTROPY OF THE ENTIRE KUHN TREE
 
         mod = self.round // 100
-        ent = -0.05 / (mod + 1)
+        ent = -0.03 / (mod + 1)
         # # ent = -0.1 / (np.log(self.round + 2.0))
         # self.nodestouched += len(self.visited[0])
         # self.nodestouched += len(self.visited[1])
@@ -428,8 +427,8 @@ class LazyCFR:
         return
 
     def updateKomwu(self, player):
-        eta = 0.1
-        optimistic_gradient = self.grad[player] #2.0 * self.grad[player] - 1.0 * self.last_gradient[player]
+        eta = 20.0
+        optimistic_gradient = 4.0 * self.grad[player] - 3.0 * self.last_gradient[player]
         self.last_gradient[player] = self.grad[player].copy()
         self.b[player] += eta * optimistic_gradient
         self.last_opt = self.opt - 1.0
