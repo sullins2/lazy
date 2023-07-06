@@ -9,6 +9,7 @@ from scipy.special import logsumexp
 
 
 class LazyCFR:
+    test = 1
     def __init__(self, game, Type="regretmatching", thres=0.0):
         print("initializing solver")
         self.thres = thres
@@ -312,7 +313,6 @@ class LazyCFR:
         for infoset_id in self.visited[1][::-1]:
             vals = []
             sum_vals = 0.0
-            # reg = self.solvers[1][infoset_id].cfrreg()
             for i, seq in enumerate(self.game.seqs[1][infoset_id]):
                 pol = self.stgy[1][infoset_id][i]
                 if pol <= 0:
