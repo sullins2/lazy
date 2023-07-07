@@ -52,17 +52,17 @@ if args.Type:
 # print(algo, Type, savepath)
 
 # This is for all Leduc
-if betm>7:
-	game = Game(path=savepath+".npz")
-else:
-	betm = 6
-	game = Game( bidmaximum =betm) #path=savepath+".npz")#bidmaximum=betmpath=
+# if betm>7:
+# 	game = Game(path=savepath+".npz")
+# else:
+# 	betm = 3
+# 	game = Game( bidmaximum =betm) #path=savepath+".npz")#bidmaximum=betmpath=
 
 # This is for Kuhn
-# if betm>7:
-# 	game = KuhnGame(path=savepath+".npz")
-# else:
-# 	game = KuhnGame( bidmaximum =betm)#path=savepath+".npz")#bidmaximum=betmpath=
+if betm>7:
+	game = KuhnGame(path=savepath+".npz")
+else:
+	game = KuhnGame( bidmaximum =betm)#path=savepath+".npz")#bidmaximum=betmpath=
 
 # print("-----------------------------")
 # print(game.infoSets[0])
@@ -97,7 +97,7 @@ printround=[10000, 8000, 6000, 4000, 2000, 100, 50, 200, 100, 50, 1, 1]
 
 def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 	# thres = -0.0045 #5  # Lazy-CFR uses 0.1 for larger games
-	thres = 0.01
+	thres = -0.01
 	def solve(gamesolver, reporttime=60, timelim = 30000, minimum=0):
 		expl_plot = []
 		expl_iters = []
@@ -114,27 +114,11 @@ def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 		z = 2
 		lastexpl = 0.0
 		plot_its = []
-		while z <= 1850: #: 0000000: #cumutime + time.time() - timestamp < timelim or gamesolver.nodestouched < minimum:
+		stgy = None
+		while z <= 40: #: 0000000: #cumutime + time.time() - timestamp < timelim or gamesolver.nodestouched < minimum:
 			z += 1
 			plot_its.append(z)
 			rounds += 1
-			# solver.thres = 0.01 + (solver.round / 3200) * (1.0 - 0.01)
-			# if z % 20 == 0:
-			# 	curexpl = solver.getExploitability()
-			# 	dif = np.abs(curexpl - lastexpl)
-			# 	if dif < 0.001:
-			# 		solver.opt = 12.0
-			# 		solver.b[0] *= 0.95
-			# 		solver.b[1] *= 0.95
-			# 	else:
-			# 		solver.opt = 2.0
-			# 	print("SOVER OPT:", solver.opt)
-			# 	lastexpl = curexpl
-
-			# if z < 20 == 0:
-			# 	solver.thres = -0.05
-			# else:
-			# 	solver.thres = 0.00001
 			if z % PLOT_ITERS == 0:
 				curexpl = solver.getExploitability()
 				expl_plot.append(curexpl)
@@ -150,7 +134,7 @@ def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 				# 	z = np.inf
 				# 	if solver.round > 6000:
 				# 		break
-			gamesolver.updateAll()
+			stgy = gamesolver.updateAll()
 			if time.time() - timestamp > reporttimes[betm]:
 				cumutime += time.time() - timestamp
 				expl = gamesolver.getExploitability()
@@ -169,12 +153,12 @@ def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 				# np.savez(res_path, expl = expls, times = times, nodes = nodes)
 
 		# Plot exploitability
-		plt.plot(expl_iters, expl_plot, 'b-', label='Lazy-KFLBR')
-		plt.xlabel('Nodes Touched')
-		plt.ylabel('Exploitability')
-		plt.ylim(0.0, 1.0)  # Set y-axis range
-		plt.legend()
-		plt.show()
+		# plt.plot(expl_iters, expl_plot, 'b-', label='Lazy-KFLBR')
+		# plt.xlabel('Nodes Touched')
+		# plt.ylabel('Exploitability')
+		# plt.ylim(0.0, 1.0)  # Set y-axis range
+		# plt.legend()
+		# plt.show()
 
 		# Plot entropy
 		# plt.plot(plot_its, solver.total_entropy[0], 'b-', label='player0')
@@ -191,11 +175,12 @@ def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 		# 			 textcoords='offset points', arrowprops=dict(arrowstyle='->'))
 		# plt.annotate(f'{last_value_player1:.2f}', xy=(plot_its[last_value_idx], last_value_player1), xytext=(10, -20),
 		# 			 textcoords='offset points', arrowprops=dict(arrowstyle='->'))
-
-		plt.show()
+		# plt.show()
 
 		print("shape", len(expls), len(times), len(nodes))
-		return (expls, times, nodes)
+		# print("HERE: ", stgy)
+		expl = gamesolver.getExploitability()
+		return (expls, times, nodes, stgy, expl)
 	print("initializing solver")
 	solver = None
 	if solvername == "cfr":
@@ -220,5 +205,41 @@ def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 	res = solve(solver)
 	return res
 
+# res = run(game, Type=Type, solvername=algo)
 
+algo = "cfr"
+game = Game( bidmaximum=3)
+# game = KuhnGame( bidmaximum =betm)
 res = run(game, Type=Type, solvername=algo)
+stgy0 = res[3]
+expl0 = res[4]
+r0, v0 = generateOutcome(game, stgy0)
+# print(stgy0)
+
+algo = "lazycfr_nocomments"
+game = Game( bidmaximum=3)
+# game = KuhnGame( bidmaximum =betm)
+res = run(game, Type=Type, solvername=algo)
+stgy1 = res[3]
+expl1 = res[4]
+r1, v1 = generateOutcome(game, stgy1)
+
+stgy_prof = [stgy0[0], stgy1[1]]
+
+r, v = generateOutcome(game, stgy_prof)
+
+print("Exploit0:", expl0, "Exploit1:", expl1)
+print("First:, ", r0[0], v0[0])
+print("Second:, ", r1[0], v1[0])
+print("Against:", r[0], v[0])
+
+
+# expl_iters = [t for t in range(150)]
+# plt.plot(expl_iters, stgy0, 'b-', label='CFR')
+# plt.plot(expl_iters, stgy0, 'r-', label='KOMWU')
+# plt.xlabel('Iteration')
+# plt.ylabel('Policy')
+# plt.ylim(0.0, 1.0)  # Set y-axis range
+# plt.legend()
+# plt.show()
+

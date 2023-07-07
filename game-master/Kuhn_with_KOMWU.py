@@ -129,7 +129,7 @@ class KuhnGame:
                 player=2):
         x, y = parhists.shape
 
-        print("PLAYER: ", player, " DEPTH: ", depth, " x: ", x, " y: ", y)
+        # print("PLAYER: ", player, " DEPTH: ", depth, " x: ", x, " y: ", y)
         # print("CARDS: ", self.cards)
 
         histids = np.ones((x, y))
@@ -143,20 +143,20 @@ class KuhnGame:
         elif privatecard[1][0][0] == -1:  # second iteration
             obs[0] = False
 
-        print("OBS: ", obs)
+        # print("OBS: ", obs)
 
         def genNactsOnHist():
             if isTerminal:
                 return 0
             if player == 2 and obs[1] == False:
-                # print("Numacts on hist (player 2):", int(self.cards))
+                # # print("Numacts on hist (player 2):", int(self.cards))
                 return int(self.cards)
             if player == 2 and obs[0] == False:
                 return int(self.cards)
             if bids[1 - player] == -1:
-                # print("Numacts on hist: (bids -1)", self.bidmaximum + 1)
+                # # print("Numacts on hist: (bids -1)", self.bidmaximum + 1)
                 return int(self.bidmaximum + 1)  # pretty sure this means bet 1 or check
-            # print("Numacts on hist: (OTHER)", 2 + int(self.bidmaximum - bids[1 - player]))
+            # # print("Numacts on hist: (OTHER)", 2 + int(self.bidmaximum - bids[1 - player]))
             return 2 + int(self.bidmaximum - bids[1 - player])  # call, fold or raise amount left?
 
         def genNactsOnIset(owner):
@@ -166,7 +166,7 @@ class KuhnGame:
                 return 1
             return genNactsOnHist()
 
-        # print("isTerminal", isTerminal, "privatecard", privatecard, "publiccard", publiccard, "bids", bids, "quit", quit, "obs", obs)
+        # # print("isTerminal", isTerminal, "privatecard", privatecard, "publiccard", publiccard, "bids", bids, "quit", quit, "obs", obs)
 
         if player == 0:
             totseqs0 = [[] for _ in range(genNactsOnIset(0))]
@@ -177,32 +177,32 @@ class KuhnGame:
         else:
             totseqs1 = None
 
-        print("RER")
-        print(totseqs0)
+        # print("RER")
+        # print(totseqs0)
         for i in range(x):
-            print("FOR X")
-            print("selfparids[0]:", selfparids)
+            # print("FOR X")
+            # print("selfparids[0]:", selfparids)
             self.isetSucc[0].append([])
             self.isetPar[0].append(0)
             self.playerOfIset[0].append(0)
             self.nactsOnIset[0].append(0)
             self.Iset2Hists[0].append(0)
             isetids[0][i] = int(self.numIsets[0])
-            print("isetid: ", isetids[0][i])
+            # print("isetid: ", isetids[0][i])
             self.isetPar[0][self.numIsets[0]] = (int(parisets[0][i]), int(iacts[0][i]))
-            print("isetPar: ", self.isetPar[0][self.numIsets[0]])
+            # print("isetPar: ", self.isetPar[0][self.numIsets[0]])
             self.playerOfIset[0][self.numIsets[0]] = player
-            print("playerOfIset: ", player)
+            # print("playerOfIset: ", player)
 
             self.nactsOnIset[0][self.numIsets[0]] = genNactsOnIset(0)
-            print("Num acts on iset: ", self.nactsOnIset[0][self.numIsets[0]])
+            # print("Num acts on iset: ", self.nactsOnIset[0][self.numIsets[0]])
             ################# KOMWU
             seqs0 = []
             # nxtpars0 = []
             if player == 0:
-                print("Here would have lastparseq0: ", lastparseq0)
+                # print("Here would have lastparseq0: ", lastparseq0)
                 if lastparseq0 is not None:
-                    print("Setting parSeq to be: ", lastparseq0[i])
+                    # print("Setting parSeq to be: ", lastparseq0[i])
                     self.parSeq[0][self.numIsets[0]] = lastparseq0[i]
                 self.infoSets[0].append(self.numIsets[0]) # self.numInfoSets[0]) # create the infoset
                 for ii in range(1, genNactsOnIset(0) + 1):
@@ -213,46 +213,46 @@ class KuhnGame:
                 self.totalSeqs[0] += genNactsOnIset(0)
 
             #################
-            print("TOTAL SEQS0")
-            print(totseqs0)
-            # print(" x acts: ", self.nactsOnIset[0][self.numIsets[0]])
+            # print("TOTAL SEQS0")
+            # print(totseqs0)
+            # # print(" x acts: ", self.nactsOnIset[0][self.numIsets[0]])
 
             if parisets[0][i] >= 0:
                 # if True: #player == 0:
-                #     print("****************************")
-                #     print("For parisets:", parisets[0][i], " to get to isetids:", isetids[0][i])
+                #     # print("****************************")
+                #     # print("For parisets:", parisets[0][i], " to get to isetids:", isetids[0][i])
                 #     if lastparseq0 is not None:
-                #         print("lastparseq0[i]: i:", i, " value:", lastparseq0[i])
-                #     print("****************************")
-                print("PARISET ABOVE 0. lastchance:", lastchance, "  iset:", isetids[0][i])
+                #         # print("lastparseq0[i]: i:", i, " value:", lastparseq0[i])
+                #     # print("****************************")
+                # print("PARISET ABOVE 0. lastchance:", lastchance, "  iset:", isetids[0][i])
                 self.isetSucc[0][int(parisets[0][i])].append(int(isetids[0][i]))
                 if int(parisets[0][i]) not in self.isetSuccSeq[0] and int(parisets[0][i]) is not None:
-                    print("  setting:",parisets[0][i])
+                    # print("  setting:",parisets[0][i])
                     self.isetSuccSeq[0][int(parisets[0][i])] = {}
                 if int(parisets[0][i]) is not None and int(isetids[0][i]) is not None:
                     if lastparseq0 is not None:
-                        print("  lastparseq0 not None. Setting", int(parisets[0][i]), " to ", int(isetids[0][i]), " via seq:", lastparseq0[i])
+                        # print("  lastparseq0 not None. Setting", int(parisets[0][i]), " to ", int(isetids[0][i]), " via seq:", lastparseq0[i])
                         self.isetSuccSeq[0][int(parisets[0][i])][int(isetids[0][i])] = lastparseq0[i]
 
             self.numIsets[0] += 1
 
         for i in range(y):
-            print("FOR Y")
-            print("selfparids[1]:", selfparids)
+            # print("FOR Y")
+            # print("selfparids[1]:", selfparids)
             self.isetSucc[1].append([])
             self.isetPar[1].append(0)
             self.playerOfIset[1].append(0)
             self.nactsOnIset[1].append(0)
             self.Iset2Hists[1].append(0)
             isetids[1][i] = int(self.numIsets[1])
-            print("isetids: ", isetids[1][i])
+            # print("isetids: ", isetids[1][i])
             self.isetPar[1][self.numIsets[1]] = (int(parisets[1][i]), int(iacts[1][i]))
-            print("isetPar: ", self.isetPar[1][self.numIsets[1]])
+            # print("isetPar: ", self.isetPar[1][self.numIsets[1]])
             self.playerOfIset[1][self.numIsets[1]] = player
-            print("playerOfIset: ", player)
+            # print("playerOfIset: ", player)
 
             self.nactsOnIset[1][self.numIsets[1]] = genNactsOnIset(1)
-            print("Num acts on iset: ", self.nactsOnIset[1][self.numIsets[1]])
+            # print("Num acts on iset: ", self.nactsOnIset[1][self.numIsets[1]])
 
 
             ################# KOMWU
@@ -260,8 +260,8 @@ class KuhnGame:
             # nxtpars1 = []
             if player == 1:
                 if lastparseq1 is not None:
-                    print(lastparseq1)
-                    print("Setting parSeq to be: ", lastparseq1[i])
+                    # print(lastparseq1)
+                    # print("Setting parSeq to be: ", lastparseq1[i])
                     self.parSeq[1][self.numIsets[1]] = lastparseq1[i]
                 self.infoSets[1].append(self.numIsets[1]) #self.numInfoSets[1])  # create the infoset
 
@@ -274,16 +274,16 @@ class KuhnGame:
                 self.totalSeqs[1] += genNactsOnIset(1)
             #################
 
-            print("TOTAL SEQS1")
-            print(totseqs1)
+            # print("TOTAL SEQS1")
+            # print(totseqs1)
 
             if parisets[1][i] >= 0:
                 # if True: #player == 0:
-                #     print("****************************")
-                #     print("For parisets:", parisets[1][i], " to get to isetids:", isetids[1][i])
+                #     # print("****************************")
+                #     # print("For parisets:", parisets[1][i], " to get to isetids:", isetids[1][i])
                 #     if lastparseq1 is not None:
-                #         print("lastparseq0[i]: i:", i, " value:", lastparseq1[i])
-                #     print("****************************")
+                #         # print("lastparseq0[i]: i:", i, " value:", lastparseq1[i])
+                #     # print("****************************")
                 self.isetSucc[1][int(parisets[1][i])].append(int(isetids[1][i]))
                 if int(parisets[1][i]) not in self.isetSuccSeq[1] and int(parisets[1][i]) is not None:
                     self.isetSuccSeq[1][int(parisets[1][i])] = {}
@@ -292,7 +292,7 @@ class KuhnGame:
                         self.isetSuccSeq[1][int(parisets[1][i])][int(isetids[1][i])] = lastparseq1[i]
             self.numIsets[1] += 1
 
-        # print("HISTORIES")
+        # # print("HISTORIES")
         for i in range(x):
             for j in range(y):
                 self.isTerminal.append(False)
@@ -305,20 +305,20 @@ class KuhnGame:
                 self.Hist2Iset[0].append(0)
                 self.Hist2Iset[1].append(0)
                 histids[i][j] = int(self.numHists)
-                print("histids: ", histids[i][j])
+                # print("histids: ", histids[i][j])
                 self.histPar[self.numHists] = (int(parhists[i][j]), int(hacts[i][j]))
-                print("histPar: ", self.histPar[self.numHists])
+                # print("histPar: ", self.histPar[self.numHists])
                 self.playerOfHist[self.numHists] = player
-                print("playerOfHis: ", player)
+                # print("playerOfHis: ", player)
                 self.isTerminal[self.numHists] = isTerminal
                 self.Hist2Iset[0][self.numHists] = int(isetids[0][i])
-                print("Hist2Iset[0]: ", int(isetids[0][i]))
+                # print("Hist2Iset[0]: ", int(isetids[0][i]))
                 self.Hist2Iset[1][self.numHists] = int(isetids[1][j])
-                print("Hist2Iset[1]: ", int(isetids[1][j]))
+                # print("Hist2Iset[1]: ", int(isetids[1][j]))
 
                 if player == 2:
                     if privatecard[0][i][j] == -1:
-                        print("Setting chance prob to: ", np.ones(self.cards) / self.cards)
+                        # print("Setting chance prob to: ", np.ones(self.cards) / self.cards)
                         h = np.ones(self.cards) / self.cards
                         # h[0] -= 0.33 # 0.13333333333 * 0.4 < 0.1
                         # h[1] += 0.33
@@ -330,15 +330,15 @@ class KuhnGame:
                         for _a in range(self.cards):
                             if _a == int(privatecard[0][i][j]):
                                 self.chanceprob[int(self.numHists)][_a] = 0.0
-                                print("Setting chance prob to: ", 0.0)
+                                # print("Setting chance prob to: ", 0.0)
                             else:
                                 # if _a == 0:
                                 #     f = 1.0 / 10000.0
                                 # else:
                                 #     f = 1.0 / 2.0
                                 self.chanceprob[int(self.numHists)][_a] = 1.0  / 2.0
-                                print("Setting chance prob to: ", 1.0 / 2.0)
-                                print("FFFFF: ", _a)
+                                # print("Setting chance prob to: ", 1.0 / 2.0)
+                                # print("FFFFF: ", _a)
                     # else:
                     #     self.chanceprob.append(np.ones(self.cards))
                     #     for _a in range(self.cards):
@@ -358,10 +358,10 @@ class KuhnGame:
                     self.nactsOnHist[self.numHists] = 1 - (self.bidmaximum - bids[1 - player])
                 """
                 self.nactsOnHist[self.numHists] = genNactsOnHist()
-                # print("nactsOnHist: ", self.nactsOnHist[self.numHists])
+                # # print("nactsOnHist: ", self.nactsOnHist[self.numHists])
                 if parhists[i][j] >= 0:
                     self.histSucc[int(parhists[i][j])].append(int(histids[i][j]))
-                print("Setting parhist: ", parhists[i][j], " to have histSucc: ", int(histids[i][j]))
+                # print("Setting parhist: ", parhists[i][j], " to have histSucc: ", int(histids[i][j]))
                 self.numHists += 1
 
         for i in range(x):
@@ -377,20 +377,20 @@ class KuhnGame:
                 for j in range(y):
                     win = 1
                     if quit[0]:
-                        # print("Player 0 Folded")
+                        # # print("Player 0 Folded")
                         win = -1
                         self.reward[int(histids[i][j])] = (-1.0, 1.0)
-                        print("Reward -1")
+                        # print("Reward -1")
                     elif quit[1]:
-                        # print("Player 1 Folded")
+                        # # print("Player 1 Folded")
                         win = 1
                         self.reward[int(histids[i][j])] = (1.0, -1.0)
-                        print("Reward 1")
+                        # print("Reward 1")
                     elif privatecard[0][i][j] == privatecard[1][i][j]:
-                        # print("TIE TIE TIE")
+                        # # print("TIE TIE TIE")
                         win = 0
                         self.reward[int(histids[i][j])] = (0, 0)
-                        print("Reward 0")
+                        # print("Reward 0")
                     # elif privatecard[0][i][j] == publiccard:
                     #     win = 1
                     # elif privatecard[1][i][j] == publiccard:
@@ -398,34 +398,34 @@ class KuhnGame:
                     # Check the bids to see what to set the reward to
                     #   different for check check and bet call
                     elif privatecard[0][i][j] > privatecard[1][i][j]:
-                        # print("Player 0 Wins. Bids: ", bids, " depth: ", depth)
+                        # # print("Player 0 Wins. Bids: ", bids, " depth: ", depth)
                         win = 1
                         if depth == 4 or depth == 5:
                             if int(bids[0]) == 1:
                                 self.reward[int(histids[i][j])] = (2.0, -2.0)
-                                print("Reward 2")
+                                # print("Reward 2")
                             if int(bids[0]) == -1:
                                 self.reward[int(histids[i][j])] = (1.0, -1.0)
-                                print("Reward 1")
+                                # print("Reward 1")
                     elif privatecard[0][i][j] < privatecard[1][i][j]:
                         win = -1
-                        # print("Player 1 Wins. Bids: ", bids, " depth: ", depth)
+                        # # print("Player 1 Wins. Bids: ", bids, " depth: ", depth)
                         if depth == 4 or depth == 5:
                             if int(bids[0]) == 1:
                                 self.reward[int(histids[i][j])] = (-2.0, 2.0)
-                                print("Reward -2")
+                                # print("Reward -2")
                             if int(bids[0]) == -1:
                                 self.reward[int(histids[i][j])] = (-1.0, 1.0)
-                                print("Reward -1")
+                                # print("Reward -1")
                     # if win == 0:
                     #     self.reward[int(histids[i][j])] = (0, 0)
                     # elif win == 1:
-                    #     # print("Player 0 wins. Bids: ", bids)
+                    #     # # print("Player 0 wins. Bids: ", bids)
                     #     self.reward[int(histids[i][j])] = (bids[1] + 0.5, -bids[1] - 0.5)
                     # elif win == -1:
-                    #     # print("Player 1 wins. Bids: ", bids)
+                    #     # # print("Player 1 wins. Bids: ", bids)
                     #     self.reward[int(histids[i][j])] = (-bids[0] - 1, bids[0] + 1)
-                # print("Just set a terminal")
+                # # print("Just set a terminal")
             return  # histids, isetids
 
         if obs[0] == False:
