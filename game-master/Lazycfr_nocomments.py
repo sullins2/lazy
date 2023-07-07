@@ -290,7 +290,7 @@ class LazyCFR:
         # TODO WRITE CODE TO CALCULATE THE ENTROPY OF THE ENTIRE KUHN TREE
 
         mod = self.round // 100
-        ent = -0.2 / (mod + 1)
+        ent = -0.1 / (mod + 1)
         # # ent = -0.1 / (np.log(self.round + 2.0))
         # self.nodestouched += len(self.visited[0])
         # self.nodestouched += len(self.visited[1])
@@ -419,7 +419,7 @@ class LazyCFR:
         return
 
     def updateKomwu(self, player):
-        eta = 20.0
+        eta = 25.0
         optimistic_gradient = 4.0 * self.grad[player] - 3.0 * self.last_gradient[player]
         self.last_gradient[player] = self.grad[player].copy()
         self.b[player] += eta * optimistic_gradient
