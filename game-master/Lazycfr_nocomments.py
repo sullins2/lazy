@@ -290,7 +290,7 @@ class LazyCFR:
         # TODO WRITE CODE TO CALCULATE THE ENTROPY OF THE ENTIRE KUHN TREE
 
         mod = self.round // 100
-        ent = -0.09 / (mod + 1)
+        ent = -0.1 / (mod + 1)
         # # ent = -0.1 / (np.log(self.round + 2.0))
         # self.nodestouched += len(self.visited[0])
         # self.nodestouched += len(self.visited[1])
