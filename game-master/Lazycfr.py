@@ -193,6 +193,8 @@ class LazyCFR:
 		updateoutcome(0)
 
 		self.time += time.time() - t1
+		self.getExploitability()
+		return self.mike
 
 	def getAvgStgy(self, owner, iset):
 		game = self.game

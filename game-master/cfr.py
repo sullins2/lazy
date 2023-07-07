@@ -97,8 +97,8 @@ class CFR:
 					updSumstgy(owner, nxtiset, prob)
 		updSumstgy(0, 0)
 		updSumstgy(1, 0)
-		self.getExploitability()
-		return self.mike
+		#self.getExploitability()
+		#return self.mike
 
 	def update(self, owner, iset, probs, histories):
 		self.isetflag[owner][iset] = self.round

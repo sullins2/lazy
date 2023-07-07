@@ -103,8 +103,8 @@ class LazyCFR:
         self.nodestouched = 0
         self.outcome, self.reward = generateOutcome(game, self.stgy)
 
-        self.opt = 2.0
-        self.last_opt = 1.0
+        self.opt = [4.0, 4.0]
+        self.last_opt = [3.0, 3.0]
 
         self.grad = [np.zeros(self.AMMO), np.zeros(self.AMMO)]
         self.last_grad = [np.zeros(self.AMMO), np.zeros(self.AMMO)]
@@ -121,6 +121,8 @@ class LazyCFR:
 
 
         self.regret = [np.zeros(self.total_seqs[0] + 1), np.zeros(self.total_seqs[1] + 1)]
+
+        self.opt_levels = []
 
         self.sumstgy = [[], []]
         for i, iset in enumerate(range(game.numIsets[0])):
@@ -145,7 +147,7 @@ class LazyCFR:
         self.game.childrenInfosets[0] = b0
         self.game.childrenInfosets[1] = b1
 
-        self.last_stgy = None
+        self.last_stgy = [None, None]
 
     def receiveProb(self, owner, histind, prob):
         self.probNotPassed[owner][histind] += prob
@@ -290,7 +292,7 @@ class LazyCFR:
         # TODO WRITE CODE TO CALCULATE THE ENTROPY OF THE ENTIRE KUHN TREE
 
         mod = self.round // 100
-        ent = 0.0#-0.05 / (mod + 1)
+        ent = -0.02 / (mod + 1)
         # # ent = -0.1 / (np.log(self.round + 2.0))
         # self.nodestouched += len(self.visited[0])
         # self.nodestouched += len(self.visited[1])
@@ -420,18 +422,36 @@ class LazyCFR:
         return
 
     def updateKomwu(self, player):
-        eta = 1.0
-        optimistic_gradient = 2.0 * self.grad[player] - 1.0 * self.last_gradient[player]
+
+        sum_vals = 0.0
+        if self.last_stgy[player] != None:
+            vals = []
+            for infoset_id in self.visited[player][::-1]:
+                sum_vals = 0.0
+                for i, seq in enumerate(self.game.seqs[player][infoset_id]):
+                    old_pol = self.stgy[player][infoset_id][i]
+                    pol = self.last_stgy[player][infoset_id][i]
+                    if pol <= 0:
+                        pol = 0.00000000000000000000000000000001
+                    if old_pol <= 0:
+                        old_pol = 0.00000000000000000000000000000001
+                    sum_vals += pol * np.log(pol / old_pol)
+                    vals.append(pol * np.log(pol / old_pol))
+                KL = 1.0
+                for i, seq in enumerate(self.game.seqs[player][infoset_id]):
+                    self.b[player][seq] += KL*(vals[i] - sum_vals)
+
+        eta = 20.0
+        optimistic_gradient = self.opt[player] * self.grad[player] - self.last_opt[player] * self.last_gradient[player]
         self.last_gradient[player] = self.grad[player].copy()
         self.b[player] += eta * optimistic_gradient
-        self.last_opt = self.opt - 1.0
+        self.last_opt[player] = self.opt[player] - 1.0
 
 
         # Computes KL Divergence of current policy and last policy
-        # if self.last_stgy != None:
+        # sum_vals = 0.0
+        # if self.last_stgy[player] != None:
         #     for infoset_id in self.visited[player][::-1]:
-        #         vals = []
-        #         sum_vals = 0.0
         #         for i, seq in enumerate(self.game.seqs[player][infoset_id]):
         #             pol = self.stgy[player][infoset_id][i]
         #             old_pol = self.last_stgy[player][infoset_id][i]
@@ -444,11 +464,24 @@ class LazyCFR:
         #             # vals.append(np.log(pol))
         #         # for i, seq in enumerate(self.game.seqs[1][infoset_id]):
         #         #     self.b[1][seq] += ent*(vals[i] - sum_vals)
-        #
-        # print("KL:", sum_vals)
-        # self.last_stgy = self.stgy.copy()
 
+        # print("KL:", sum_vals, " self.round:", self.round)
+        self.last_stgy[player] = copy.deepcopy(self.stgy[player])
+        # if self.round > 145:
+        #     self.opt[0] = 25.0
+        #     self.opt[1] = 25.0
+        # if sum_vals < 0.001:
+        #     self.opt[player] = 15.0
+        #     self.opt[player] = min(self.opt[player], 25.0)
+        # else:
+        #     self.opt[player] = 2.0
+        #     self.opt[player] = max(self.opt[player], 2.0)
+        if player == 0:
+            self.opt_levels.append(self.opt[0])
 
+        # if player == 0 and self.round > 115:
+        #     print("KL:", sum_vals)
+        # print("OPT:", self.opt)
 
         # total_seq_values = np.zeros(self.total_seqs[player] + 1)
         # exp_value = np.zeros(self.AMMO + 1)
@@ -498,8 +531,12 @@ class LazyCFR:
                 self.exp_y[player][sequence_id] = np.exp(y[sequence_id])
                 denom += self.exp_y[player][sequence_id]
             for ii, sequence_id in enumerate(self.new_seqs[player][infoset_id]):
-                self.stgy[player][infoset_id][ii] = self.exp_y[player][sequence_id] / denom
+                # self.alpha = 1.0 - (1.0 / (self.round + 1.0) ** 2.0)
+                self.stgy[player][infoset_id][ii] = self.exp_y[player][sequence_id] / denom #+ (1.0-self.alpha)*(1.0 / len(self.new_seqs[player][infoset_id]))
 
+
+        # if player == 0:
+        #     print(self.stgy[player][4][0], self.last_stgy[player][4][0])
         self.nodestouched += len(self.visited[player][::-1]) * 2
         # for infoset_id in self.visited[player][::-1]:        #self.game.infoSets[player][::-1]:
         #     for seq in self.game.seqs[player][infoset_id]:
