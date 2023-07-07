@@ -52,8 +52,8 @@ class LazyCFR:
 
 
         self.solvers = []
-        self.solvers.append(list(map(lambda x: RegretSolver(game.nactsOnIset[0][x]), range(game.numIsets[0]))))
-        self.solvers.append(list(map(lambda x: RegretSolver(game.nactsOnIset[1][x]), range(game.numIsets[1]))))
+        self.solvers.append(list(map(lambda x: RegretSolver(game.nactsOnIset[0][x], None), range(game.numIsets[0]))))
+        self.solvers.append(list(map(lambda x: RegretSolver(game.nactsOnIset[1][x], None), range(game.numIsets[1]))))
 
         self.stgy = [[], []]
 
@@ -288,11 +288,8 @@ class LazyCFR:
         # self.grad = [np.array(grad0), np.array(grad1)]
 
 
-        # TODO VISUALLY INSPECT THE POLICY DURING TRAINING
-        # TODO WRITE CODE TO CALCULATE THE ENTROPY OF THE ENTIRE KUHN TREE
-
         mod = self.round // 100
-        ent = -0.02 / (mod + 1)
+        ent = -0.01 / (mod + 1)
         # # ent = -0.1 / (np.log(self.round + 2.0))
         # self.nodestouched += len(self.visited[0])
         # self.nodestouched += len(self.visited[1])
@@ -328,17 +325,17 @@ class LazyCFR:
 
 
         # For plotting entropy of stgy
-        # if len(self.total_entropy[0]) > 1:
-        #     self.total_entropy[0].append(self.total_entropy[0][-1] + -total_entropy0)
-        #     self.total_entropy[1].append(self.total_entropy[1][-1] + -total_entropy1)
-        # else:
-        #     self.total_entropy[0].append(-total_entropy0)
-        #     self.total_entropy[1].append(-total_entropy1)
+        if len(self.total_entropy[0]) > 1:
+            self.total_entropy[0].append(self.total_entropy[0][-1] + -total_entropy0)
+            self.total_entropy[1].append(self.total_entropy[1][-1] + -total_entropy1)
+        else:
+            self.total_entropy[0].append(-total_entropy0)
+            self.total_entropy[1].append(-total_entropy1)
 
 
         # Plot strategy
-        self.total_entropy[0].append(self.stgy[0][4][0])
-        self.total_entropy[1].append(self.stgy[1][5][1])
+        # self.total_entropy[0].append(self.stgy[0][4][0])
+        # self.total_entropy[1].append(self.stgy[1][5][1])
 
 
         self.updateKomwu(0)
@@ -423,7 +420,8 @@ class LazyCFR:
 
     def updateKomwu(self, player):
 
-        sum_vals = 0.0
+        # This is the new KL bonus
+        KL = 1.0
         if self.last_stgy[player] != None:
             vals = []
             for infoset_id in self.visited[player][::-1]:
@@ -437,11 +435,10 @@ class LazyCFR:
                         old_pol = 0.00000000000000000000000000000001
                     sum_vals += pol * np.log(pol / old_pol)
                     vals.append(pol * np.log(pol / old_pol))
-                KL = 1.0
                 for i, seq in enumerate(self.game.seqs[player][infoset_id]):
                     self.b[player][seq] += KL*(vals[i] - sum_vals)
 
-        eta = 20.0
+        eta = 1.0
         optimistic_gradient = self.opt[player] * self.grad[player] - self.last_opt[player] * self.last_gradient[player]
         self.last_gradient[player] = self.grad[player].copy()
         self.b[player] += eta * optimistic_gradient
@@ -467,24 +464,10 @@ class LazyCFR:
 
         # print("KL:", sum_vals, " self.round:", self.round)
         self.last_stgy[player] = copy.deepcopy(self.stgy[player])
-        # if self.round > 145:
-        #     self.opt[0] = 25.0
-        #     self.opt[1] = 25.0
-        # if sum_vals < 0.001:
-        #     self.opt[player] = 15.0
-        #     self.opt[player] = min(self.opt[player], 25.0)
-        # else:
-        #     self.opt[player] = 2.0
-        #     self.opt[player] = max(self.opt[player], 2.0)
         if player == 0:
             self.opt_levels.append(self.opt[0])
 
-        # if player == 0 and self.round > 115:
-        #     print("KL:", sum_vals)
-        # print("OPT:", self.opt)
 
-        # total_seq_values = np.zeros(self.total_seqs[player] + 1)
-        # exp_value = np.zeros(self.AMMO + 1)
         for infoset_id in self.visited[player][::-1]:        #self.game.infoSets[player][::-1]:
             seq_values = []
             for i, seq in enumerate(self.game.seqs[player][infoset_id]):

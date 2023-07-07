@@ -37,6 +37,9 @@ savepath = "leduc_3_"+str(betm)
 # algo="komwu"
 # algo="lazyflbr"
 algo="lazycfr_nocomments"  # This is KOMWU
+
+# TODO TEST CFR< CFR+, DCFR ON KUHN
+
 # if args.algo:
 # 	algo = args.algo#"cfr"
 # algo="cfr"
@@ -55,7 +58,7 @@ if args.Type:
 if betm>7:
 	game = Game(path=savepath+".npz")
 else:
-	betm = 5
+	betm = 3
 	game = Game( bidmaximum =betm) #path=savepath+".npz")#bidmaximum=betmpath=
 
 # This is for Kuhn
@@ -97,7 +100,7 @@ printround=[10000, 8000, 6000, 4000, 2000, 100, 50, 200, 100, 50, 1, 1]
 
 def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 	# thres = -0.0045 #5  # Lazy-CFR uses 0.1 for larger games
-	thres = 0.004
+	thres = -0.004
 	def solve(gamesolver, reporttime=60, timelim = 30000, minimum=0):
 		expl_plot = []
 		expl_iters = []
@@ -154,13 +157,14 @@ def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 				# np.savez(res_path, expl = expls, times = times, nodes = nodes)
 
 		# Plot exploitability
-		# plt.plot(expl_iters, expl_plot, 'b-', label='Lazy-KFLBR')
-		# plt.xlabel('Nodes Touched')
-		# plt.ylabel('Exploitability')
-		# plt.ylim(0.0, 1.0)  # Set y-axis range
-		# plt.legend()
-		# plt.show()
-		#
+		plt.plot(expl_iters, expl_plot, 'b-', label='Lazy-KFLBR')
+		plt.xlabel('Nodes Touched')
+		plt.ylabel('Exploitability')
+		plt.ylim(0.0, 1.0)  # Set y-axis range
+		plt.legend()
+		plt.show()
+
+		# Plot optimism levels throughout run
 		# plt.plot(expl_iters, gamesolver.opt_levels, 'b-', label='Lazy-KFLBR')
 		# plt.xlabel('Nodes Touched')
 		# plt.ylabel('Exploitability')
@@ -173,7 +177,7 @@ def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 		# plt.plot(plot_its, solver.total_entropy[1], 'r-', label='player1')
 		# plt.xlabel('Iteration')
 		# plt.ylabel('Total Entropy')
-		# plt.ylim(0.0, 1.0)  # Set y-axis range
+		# plt.ylim(0.0, 40000.0)  # Set y-axis range
 		# plt.legend()
 		# # This adds text to display the value of the last iteration on the plot
 		# last_value_idx = -1
@@ -213,39 +217,38 @@ def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 	res = solve(solver)
 	return res
 
-# res = run(game, Type=Type, solvername=algo)
+res = run(game, Type=Type, solvername=algo)
 
 
-#----------------------------
+#-----------------------------------
 # This is to calculate game value between two algs
 # TURN OFF THE LINE ABOVE OR IT WILL RUN 3 TIMES
-algo = "lazycfr"
-Type = "regretmatchingplus"
-# Type = "dcfr"
-game = Game(bidmaximum=5)
-# game = KuhnGame( bidmaximum =betm)
-res = run(game, Type=Type, solvername=algo)
-stgy0 = res[3]
-expl0 = res[4]
-r0, v0 = generateOutcome(game, stgy0)
-
-
-algo = "lazycfr_nocomments"
-game = Game(bidmaximum=5)
-# game = KuhnGame( bidmaximum =betm)
-res = run(game, Type=Type, solvername=algo)
-stgy1 = res[3]
-expl1 = res[4]
-r1, v1 = generateOutcome(game, stgy1)
-
-stgy_prof = [stgy0[0], stgy1[1]]
-
-r, v = generateOutcome(game, stgy_prof)
-print("Exploit0:", expl0, "Exploit1:", expl1)
-print("First gv:, ", v0[0])
-print("Second gv:, ", v1[0])
-print("Against gv:",  v[0])
-#--------------------------
+# algo = "lazycfr"
+# Type = "regretmatchingplus"
+# # Type = "dcfr"
+# game = Game(bidmaximum=5)
+# # game = KuhnGame( bidmaximum =betm)
+# res = run(game, Type=Type, solvername=algo)
+# stgy0 = res[3]
+# expl0 = res[4]
+# r0, v0 = generateOutcome(game, stgy0)
+#
+# algo = "lazycfr_nocomments"
+# game = Game(bidmaximum=5)
+# # game = KuhnGame( bidmaximum =betm)
+# res = run(game, Type=Type, solvername=algo)
+# stgy1 = res[3]
+# expl1 = res[4]
+# r1, v1 = generateOutcome(game, stgy1)
+#
+# stgy_prof = [stgy0[0], stgy1[1]]
+#
+# r, v = generateOutcome(game, stgy_prof)
+# print("Exploit0:", expl0, "Exploit1:", expl1)
+# print("First gv:, ", v0[0])
+# print("Second gv:, ", v1[0])
+# print("Against gv:",  v[0])
+#------------------------------------
 
 # expl_iters = [t for t in range(150)]
 # plt.plot(expl_iters, stgy0, 'b-', label='CFR')
