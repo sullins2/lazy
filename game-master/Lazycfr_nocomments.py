@@ -419,7 +419,7 @@ class LazyCFR:
         return
 
     def updateKomwu(self, player):
-        eta = 25.0
+        eta = 20.0
         optimistic_gradient = 4.0 * self.grad[player] - 3.0 * self.last_gradient[player]
         self.last_gradient[player] = self.grad[player].copy()
         self.b[player] += eta * optimistic_gradient
