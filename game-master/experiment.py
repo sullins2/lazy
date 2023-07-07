@@ -31,7 +31,7 @@ algo="cfr"
 # algo="lazycfr"
 # algo="komwu"
 # algo="lazyflbr"
-# algo="lazycfr_nocomments"  # This is KOMWU
+algo="lazycfr_nocomments"  # This is KOMWU
 
 # Type = "regretmatching"
 # Type = "regretmatchingplus"
@@ -46,7 +46,7 @@ dcfr_params = [1.5, 0.0, 2.0]
 if betm>7:
 	game = Game(path=savepath+".npz")
 else:
-	betm = 3
+	betm = 8
 	game = Game( bidmaximum =betm) #path=savepath+".npz")#bidmaximum=betmpath=
 
 # This is for Kuhn - doesn't have betm..
