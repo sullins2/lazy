@@ -3,12 +3,12 @@ from LeducHoldem import Game
 import copy
 import queue
 import utils
-from utils import RegretSolver, generateOutcome, exploitability, RegretSolverPlus
+from utils import RegretSolver, generateOutcome, exploitability, RegretSolverPlus, RegretSolverDCFR
 import time
 
 
 class LazyCFR:
-	def __init__(self, game, Type="regretmatching", thres=0.0):
+	def __init__(self, game, Type="regretmatching", thres=0.0, params=None):
 		print("initializing solver")
 		self.thres = thres
 		self.time = 0
@@ -19,12 +19,17 @@ class LazyCFR:
 		Solver = None
 		if Type == "regretmatching":
 			Solver = RegretSolver
+			self.DCFR = False
+		elif Type == "regretmatchingplus":
+			Solver = RegretSolverPlus
+			self.DCFR = False
 		else:
-			solver = RegretSolverPlus
+			Solver = RegretSolverDCFR
+			self.DCFR = True
 
 		self.cfvCache = []
-		self.cfvCache.append(list(map(lambda x: np.zeros(game.nactsOnHist[x]), range(game.numHists))))
-		self.cfvCache.append(list(map(lambda x: np.zeros(game.nactsOnHist[x]), range(game.numHists))))
+		self.cfvCache.append(list(map(lambda x: np.zeros(game.nactsOnHist[x], params), range(game.numHists))))
+		self.cfvCache.append(list(map(lambda x: np.zeros(game.nactsOnHist[x], params), range(game.numHists))))
 
 		self.probNotUpdated = [np.zeros((game.numHists, 2)), np.zeros((game.numHists, 2))]
 		self.probNotPassed = [np.zeros((game.numHists, 2)), np.zeros((game.numHists, 2))]
@@ -34,8 +39,8 @@ class LazyCFR:
 		self.reachp = [np.zeros(game.numIsets[0]), np.zeros(game.numIsets[1])]
 
 		self.solvers = []
-		self.solvers.append(list(map(lambda x: RegretSolver(game.nactsOnIset[0][x]), range(game.numIsets[0]))))
-		self.solvers.append(list(map(lambda x: RegretSolver(game.nactsOnIset[1][x]), range(game.numIsets[1]))))
+		self.solvers.append(list(map(lambda x: Solver(game.nactsOnIset[0][x], params), range(game.numIsets[0]))))
+		self.solvers.append(list(map(lambda x: Solver(game.nactsOnIset[1][x], params), range(game.numIsets[1]))))
 
 		"""
 		"""
@@ -116,7 +121,12 @@ class LazyCFR:
 				self.cfvCache[owner][hind] *= 0.0
 			if owner == 1:
 				sumcfv *= -1.0
-			self.sumstgy[owner][isetind] += self.reachp[owner][isetind] * self.solvers[owner][isetind].curstgy
+			if self.DCFR:
+				gamma = self.solvers[owner][isetind].gamma
+				gamma_weight = (((self.round + 1.0) - 1.0) / (self.round + 1.0)) ** gamma
+			else:
+				gamma_weight = 1.0
+			self.sumstgy[owner][isetind] += self.reachp[owner][isetind] * self.solvers[owner][isetind].curstgy * gamma_weight
 			self.solvers[owner][isetind].receive(sumcfv, weight=weight)
 
 		for innerhind, hind in enumerate(game.Iset2Hists[owner][isetind]):
@@ -143,10 +153,10 @@ class LazyCFR:
 		t1 = time.time()
 		game = self.game
 		self.round += 1
-		if self.Type == "regretmatching":
+		if self.Type == "regretmatching" or self.Type == "DCFR":
 			self.reachp[0][0] += 1
 			self.reachp[1][0] += 1
-		else:
+		else: # "regretmatchingplus"
 			self.reachp[0][0] += self.round
 			self.reachp[1][0] += self.round
 		self.receiveProb(0, 0, np.ones(2))

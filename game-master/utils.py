@@ -3,7 +3,7 @@ import numpy as np
 
 
 class RegretSolver:
-	def __init__(self, dim):
+	def __init__(self, dim, params):
 		self.round = 0
 		self.sumRewVector = np.zeros(dim)
 		self.sumStgyVector = np.zeros(dim)
@@ -343,7 +343,7 @@ def generateChildren(game, stgy_prof, p):
 
 
 class RegretSolverPlus:
-	def __init__(self, dim):
+	def __init__(self, dim, params):
 		self.round = 0
 		self.sumRewVector = np.zeros(dim)
 		self.sumStgyVector = np.zeros(dim)
@@ -382,6 +382,59 @@ class RegretSolverPlus:
 
 	def regret(self):
 		m = -np.inf 
+		for i in range(self.dim):
+			m = max(m, self.sumRewVector[i])
+		return m - self.gained
+
+
+class RegretSolverDCFR:
+	def __init__(self, dim, params):
+		self.round = 0
+		self.sumRewVector = np.zeros(dim)
+		self.sumStgyVector = np.zeros(dim)
+		self.sumQ = np.zeros(dim)
+		self.gained = 0
+		self.sumWeight = 0.0
+		self.dim = dim
+		self.curstgy = np.ones(dim) / self.dim
+		self.alpha = params[0]
+		self.beta = params[1]
+		self.gamma = params[2]
+
+	def take(self):
+		s = sum(self.sumQ)
+		if s < 1e-8:
+			return np.ones(self.dim) / self.dim
+		return self.sumQ / s
+
+	def receive(self, rew, stgy=0, weight=1.0):
+		if type(stgy) == list:
+			stgy = np.array(stgy)
+		elif type(stgy) == int:
+			stgy = self.take()
+		curgain = np.inner(rew, stgy)
+		self.round += 1
+		for i in range(self.dim):
+			self.sumQ[i] += rew[i] - curgain
+			#self.sumQ[i] = max(self.sumQ[i], 0)
+			if self.sumQ[i] > 0:
+				self.sumQ[i] *= ((self.round - 1.0) ** self.alpha) / (((self.round - 1.0) ** self.alpha) + 1.0)
+			else:
+				self.sumQ[i] *= ((self.round - 1.0) ** self.beta) / (((self.round - 1.0) ** self.beta) + 1.0)
+
+		self.gained += curgain
+		self.sumRewVector += rew
+		self.sumStgyVector += self.curstgy * weight
+		self.curstgy = stgy.copy()
+		self.sumWeight += weight
+
+	def avg(self):
+		if self.sumWeight < 1e-8:
+			return np.ones(self.dim) / self.dim
+		return self.sumStgyVector / self.sumWeight
+
+	def regret(self):
+		m = -np.inf
 		for i in range(self.dim):
 			m = max(m, self.sumRewVector[i])
 		return m - self.gained

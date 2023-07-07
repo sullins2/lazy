@@ -3,20 +3,22 @@ from LeducHoldem import Game
 import copy
 import queue
 import utils
-from utils import RegretSolver, exploitability, generateOutcome, RegretSolverPlus
+from utils import RegretSolver, exploitability, generateOutcome, RegretSolverPlus, RegretSolverDCFR
 import time
 
 
 
 class CFR:
-	def __init__(self, game, Type="regretmatching"):
+	def __init__(self, game, Type="regretmatching", params=None):
 		self.game = game
 		self.Type = Type
 		Solver = None
 		if Type == "regretmatching":
 			Solver=RegretSolver
-		else:
+		elif Type == "regretmatchingplus":
 			Solver=RegretSolverPlus
+		else:
+			Solver=RegretSolverDCFR
 
 
 		self.isetflag = [-1 * np.ones(game.numIsets[0]), -1 * np.ones(game.numIsets[1])]
@@ -25,8 +27,8 @@ class CFR:
 		self.mike = None
 
 		self.solvers = []
-		self.solvers.append(list(map(lambda x:  Solver(game.nactsOnIset[0][x]), range(game.numIsets[0]))))
-		self.solvers.append(list(map(lambda x:  Solver(game.nactsOnIset[1][x]), range(game.numIsets[1]))))
+		self.solvers.append(list(map(lambda x:  Solver(game.nactsOnIset[0][x], params), range(game.numIsets[0]))))
+		self.solvers.append(list(map(lambda x:  Solver(game.nactsOnIset[1][x], params), range(game.numIsets[1]))))
 		self.stgy = [[], []]
 		for i, iset in enumerate(range(game.numIsets[0])):
 			nact = game.nactsOnIset[0][iset]
@@ -87,8 +89,12 @@ class CFR:
 
 				if self.Type == "regretmatching":
 					self.sumstgy[owner][iset] += prob * self.stgy[player][iset]
-				else:
+				elif self.Type == "regretmatchingplus":
 					self.sumstgy[owner][iset] += prob * (self.round + 1) * self.stgy[player][iset]
+				else: # DCFR
+					gamma = self.solvers[owner][iset].gamma
+					gamma_weight = (((self.round + 1.0) - 1.0) / (self.round + 1.0)) ** gamma
+					self.sumstgy[owner][iset] += prob * gamma_weight * self.stgy[player][iset]
 				for aid, nxtiset in enumerate(game.isetSucc[owner][iset]):
 					if prob * self.stgy[player][iset][aid] > 1e-8:
 						updSumstgy(owner, nxtiset, prob * self.stgy[player][iset][aid])

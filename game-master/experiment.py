@@ -221,6 +221,7 @@ def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 # TURN OFF THE LINE ABOVE OR IT WILL RUN 3 TIMES
 algo = "lazycfr"
 Type = "regretmatchingplus"
+# Type = "dcfr"
 game = Game(bidmaximum=5)
 # game = KuhnGame( bidmaximum =betm)
 res = run(game, Type=Type, solvername=algo)
