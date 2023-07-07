@@ -145,6 +145,8 @@ class LazyCFR:
         self.game.childrenInfosets[0] = b0
         self.game.childrenInfosets[1] = b1
 
+        self.last_stgy = None
+
     def receiveProb(self, owner, histind, prob):
         self.probNotPassed[owner][histind] += prob
         self.probNotUpdated[owner][histind] += prob
@@ -288,7 +290,7 @@ class LazyCFR:
         # TODO WRITE CODE TO CALCULATE THE ENTROPY OF THE ENTIRE KUHN TREE
 
         mod = self.round // 100
-        ent = -0.06 / (mod + 1)
+        ent = -0.08 / (mod + 1)
         # # ent = -0.1 / (np.log(self.round + 2.0))
         # self.nodestouched += len(self.visited[0])
         # self.nodestouched += len(self.visited[1])
@@ -337,20 +339,10 @@ class LazyCFR:
         self.total_entropy[1].append(self.stgy[1][5][1])
 
 
-
-        # for infoset_id in self.visited[1][::-1]:
-        #     reg = self.solvers[1][infoset_id].cfrreg()
-        #     for i, seq in enumerate(self.game.seqs[1][infoset_id]):
-        #         if reg[i] > 0.0:
-        #             self.b[1][seq] *= 1.1
-        #         if reg[i] < 0.0:
-        #             self.b[1][seq] *= 0.950
-
         self.updateKomwu(0)
         self.updateKomwu(1)
         self.grad = [np.zeros(self.AMMO), np.zeros(self.AMMO)]
         self.visited = [[], []]
-        # self.seqs_updated = [np.zeros(self.AMMO), np.zeros(self.AMMO)]
 
         # def updateoutcome(hist):
         #     if game.isTerminal[hist]:
@@ -432,6 +424,29 @@ class LazyCFR:
         self.last_gradient[player] = self.grad[player].copy()
         self.b[player] += eta * optimistic_gradient
         self.last_opt = self.opt - 1.0
+
+
+        # Computes KL Divergence of current policy and last policy
+        # if self.last_stgy != None:
+        #     for infoset_id in self.visited[player][::-1]:
+        #         vals = []
+        #         sum_vals = 0.0
+        #         for i, seq in enumerate(self.game.seqs[player][infoset_id]):
+        #             pol = self.stgy[player][infoset_id][i]
+        #             old_pol = self.last_stgy[player][infoset_id][i]
+        #             if pol <= 0:
+        #                 pol = 0.00000000000000000000000000000001
+        #             if old_pol <= 0:
+        #                 old_pol = 0.00000000000000000000000000000001
+        #             sum_vals += pol * np.log(pol/old_pol)
+        #             # sum_vals += pol * np.log(pol)
+        #             # vals.append(np.log(pol))
+        #         # for i, seq in enumerate(self.game.seqs[1][infoset_id]):
+        #         #     self.b[1][seq] += ent*(vals[i] - sum_vals)
+        #
+        # print("KL:", sum_vals)
+        # self.last_stgy = self.stgy.copy()
+
 
 
         # total_seq_values = np.zeros(self.total_seqs[player] + 1)
