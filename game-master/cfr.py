@@ -63,6 +63,7 @@ class CFR:
 			else:
 				self.sumstgy[1].append(np.ones(0))
 
+		self.visited = [[],[]] # As of now, DCFR requires going to all infosets for applying regret sum weights
 
 	def updateAll(self):
 		game = self.game
@@ -81,6 +82,32 @@ class CFR:
 				updStgy(owner, nxtiset)
 		updStgy(0, 0)
 		updStgy(1, 0)
+
+		# for infoset_id in self.visited[0]:
+		# 	for i in range(self.solvers[0][infoset_id].dim):
+		# 		if self.solvers[0][infoset_id].sumQ[i] >= 0:
+		# 			t = self.round + 1.0
+		# 			self.alpha = 1.5
+		# 			self.solvers[0][infoset_id].sumQ[i] *= (t ** self.alpha) / ((t**self.alpha) + 1.0) # Openspiel version
+		# 		else:
+		# 			t = self.round + 1.0
+		# 			self.beta = 0
+		# 			self.solvers[0][infoset_id].sumQ[i] *= (t ** self.beta) / ((t ** self.beta) + 1.0)  # Openspiel version
+		#
+		# for infoset_id in self.visited[1]:
+		# 	for i in range(self.solvers[1][infoset_id].dim):
+		# 		if self.solvers[1][infoset_id].sumQ[i] >= 0:
+		# 			t = self.round + 1.0
+		# 			self.alpha = 1.5
+		# 			self.solvers[1][infoset_id].sumQ[i] *= (t ** self.alpha) / ((t**self.alpha) + 1.0) # Openspiel version
+		# 		else:
+		# 			t = self.round + 1.0
+		# 			self.beta = 0
+		# 			self.solvers[1][infoset_id].sumQ[i] *= (t ** self.beta) / ((t ** self.beta) + 1.0)  # Openspiel version
+
+
+
+		self.visited = [[],[]]
 		
 
 		def updSumstgy(owner, iset, prob = 1.0):
@@ -92,9 +119,7 @@ class CFR:
 				elif self.Type == "regretmatchingplus":
 					self.sumstgy[owner][iset] += prob * (self.round + 1) * self.stgy[player][iset]
 				else: # DCFR
-					gamma = self.solvers[owner][iset].gamma
-					gamma_weight = (((self.round + 1.0) - 1.0) / (self.round + 1.0)) ** gamma
-					self.sumstgy[owner][iset] += prob * gamma_weight * self.stgy[player][iset]
+					self.sumstgy[owner][iset] += prob * (self.round + 1) ** 2.0 * self.stgy[player][iset]
 				for aid, nxtiset in enumerate(game.isetSucc[owner][iset]):
 					if prob * self.stgy[player][iset][aid] > 1e-8:
 						updSumstgy(owner, nxtiset, prob * self.stgy[player][iset][aid])

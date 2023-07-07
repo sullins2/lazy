@@ -415,12 +415,27 @@ class RegretSolverDCFR:
 		curgain = np.inner(rew, stgy)
 		self.round += 1
 		for i in range(self.dim):
+		# 	if self.sumQ[i] >= 0:
+		# 		t = self.round + 1.0
+		# 		self.alpha = 1.5
+		# 		# self.sumQ[i] *= (t ** self.alpha) / ((t**self.alpha) + 1.0) # Openspiel version
+		# 		# info_state.cumulative_regret[action] *= (
+		# 		# 		self._iteration ** self.alpha /
+		# 		# 		(self._iteration ** self.alpha + 1))
+		# 	else:
+		# 		t = self.round + 1.0
+		# 		self.beta = 0
+		# 		# self.sumQ[i] *= (t ** self.beta) / ((t ** self.beta) + 1.0)  # Openspiel version
+
+
+			# TODO THINK IT CURRENTLY IS:
+			#   CONTRIB TO AVG STRAT IS T^2 (THAT'S THERE)
+			#   BELOW CLIPS REGRETS
+			#  SO ABOVE IS ONLY PART THAT IS WRONG?
+
 			self.sumQ[i] += rew[i] - curgain
-			#self.sumQ[i] = max(self.sumQ[i], 0)
-			if self.sumQ[i] > 0:
-				self.sumQ[i] *= ((self.round - 1.0) ** self.alpha) / (((self.round - 1.0) ** self.alpha) + 1.0)
-			else:
-				self.sumQ[i] *= ((self.round - 1.0) ** self.beta) / (((self.round - 1.0) ** self.beta) + 1.0)
+			self.sumQ[i] = max(self.sumQ[i], 0)
+
 
 		self.gained += curgain
 		self.sumRewVector += rew

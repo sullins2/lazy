@@ -21,38 +21,26 @@ parser.add_argument("--betm", type=int)
 parser.add_argument("--Type", type=str)
 parser.add_argument("--algo", type=str)
 parser.add_argument("--thres", type=float)
-
 parser.add_argument("--noprune", type=int)
 args = parser.parse_args()
 
-
-
-betm=1  #MM10
-# if args.betm:
-# 	betm = args.betm
+betm=1
 savepath = "leduc_3_"+str(betm)
 
-# algo="cfr"
+algo="cfr"
 # algo="lazycfr"
 # algo="komwu"
 # algo="lazyflbr"
-algo="lazycfr_nocomments"  # This is KOMWU
+# algo="lazycfr_nocomments"  # This is KOMWU
 
-# TODO TEST CFR< CFR+, DCFR ON KUHN
-
-# if args.algo:
-# 	algo = args.algo#"cfr"
-# algo="cfr"
+# Type = "regretmatching"
 # Type = "regretmatchingplus"
-Type = "regretmatching"
-if args.Type:
-	Type=args.Type
+Type = "dcfr"
+dcfr_params = [1.5, 0.0, 2.0]
 
-# CHECK EXPLOIT CALC CODE
-# LAZY FLBR -0.001 around 21-22.5m
-# LAZY FLBR with ANY thres doesn't work yet for betm=4
 
-# print(algo, Type, savepath)
+# TODO check exploit calc code
+
 
 # This is for all Leduc
 if betm>7:
@@ -61,7 +49,7 @@ else:
 	betm = 3
 	game = Game( bidmaximum =betm) #path=savepath+".npz")#bidmaximum=betmpath=
 
-# This is for Kuhn
+# This is for Kuhn - doesn't have betm..
 # if betm>7:
 # 	game = KuhnGame(path=savepath+".npz")
 # else:
@@ -88,8 +76,6 @@ else:
 # print(game.isetSuccSeq[1])
 # print("-----------------------------")
 
-
-
 print("initializing game")
 print("game info:", game.numHists, game.numIsets, algo, Type)
 
@@ -100,7 +86,7 @@ printround=[10000, 8000, 6000, 4000, 2000, 100, 50, 200, 100, 50, 1, 1]
 
 def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 	# thres = -0.0045 #5  # Lazy-CFR uses 0.1 for larger games
-	thres = -0.004
+	thres = 0.004
 	def solve(gamesolver, reporttime=60, timelim = 30000, minimum=0):
 		expl_plot = []
 		expl_iters = []
@@ -118,7 +104,7 @@ def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 		lastexpl = 0.0
 		plot_its = []
 		stgy = None
-		Z = 200
+		Z = 2000
 		while z <= Z: #: 0000000: #cumutime + time.time() - timestamp < timelim or gamesolver.nodestouched < minimum:
 			z += 1
 			plot_its.append(z)
@@ -199,16 +185,13 @@ def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 		if args.noprune:
 			solver = cfrnoprune.CFR(game, Type=Type)
 		else:
-			solver = cfr.CFR(game, Type=Type)
+			solver = cfr.CFR(game, Type=Type, params=dcfr_params)
 	if solvername == "mccfr":
 		solver = mccfr.MCCFR(game, Type=Type)
-	if solvername == "lazycfr_nocomments":
+	if solvername == "lazycfr_nocomments": # THIS IS KOMWU
 		solver = Lazycfr_nocomments.LazyCFR(game, Type=Type, thres=thres)
 	if solvername == "lazycfr":
-		# if args.thres:
-		# 	thres = args.thres
-		# THIS IS FOR LAZY CFR solver = Lazycfr.LazyCFR(game, Type=Type, thres =thres)
-		solver = Lazycfr.LazyCFR(game, Type=Type, thres=thres)
+		solver = Lazycfr.LazyCFR(game, Type=Type, thres=thres, params=dcfr_params)
 	if solvername == "lazyflbr":
 		solver = Lazycfr_FLBR.LazyCFR(game, Type=Type, thres=thres)
 	if solvername == "komwu":
@@ -259,3 +242,11 @@ res = run(game, Type=Type, solvername=algo)
 # plt.legend()
 # plt.show()
 
+
+# ------------- CHECK LATER, PUT BACK IN
+# if args.betm:
+# 	betm = args.betm
+# if args.algo:
+# 	algo = args.algo
+# if args.Type:
+# 	Type=args.Type

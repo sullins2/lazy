@@ -289,7 +289,7 @@ class LazyCFR:
 
 
         mod = self.round // 100
-        ent = -0.01 / (mod + 1)
+        ent = -0.02 / (mod + 1)
         # # ent = -0.1 / (np.log(self.round + 2.0))
         # self.nodestouched += len(self.visited[0])
         # self.nodestouched += len(self.visited[1])
@@ -438,7 +438,7 @@ class LazyCFR:
                 for i, seq in enumerate(self.game.seqs[player][infoset_id]):
                     self.b[player][seq] += KL*(vals[i] - sum_vals)
 
-        eta = 1.0
+        eta = 10.0
         optimistic_gradient = self.opt[player] * self.grad[player] - self.last_opt[player] * self.last_gradient[player]
         self.last_gradient[player] = self.grad[player].copy()
         self.b[player] += eta * optimistic_gradient
