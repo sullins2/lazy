@@ -278,8 +278,8 @@ class LazyCFR:
         self.receiveProb(0, 0, np.ones(2))  # These set probNotPass and probNotUpdate for history
         self.receiveProb(1, 0, np.ones(2))  # to all 1 as in: probNotPassed before:  [0. 0.] prob not passed after:  [1. 1.]
 
-        self.updateIset(0, 0, [[], [], [], [], [], [], []])
-        self.updateIset(1, 0, [[], [], [], [], [], [], []])
+        self.updateIset(0, 0, [[], [], [], [], [], [], [], []])
+        self.updateIset(1, 0, [[], [], [], [], [], [], [], []])
 
         self.getAveragePolicy()
 
