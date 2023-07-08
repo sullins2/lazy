@@ -446,7 +446,7 @@ class LazyCFR:
         self.b[player] += eta * optimistic_gradient
         self.last_opt[player] = self.opt[player] - 1.0
 
-
+        c = 0
         # Computes KL Divergence of current policy and last policy
         # sum_vals = 0.0
         # if self.last_stgy[player] != None:
