@@ -430,9 +430,11 @@ class LazyCFR:
                     old_pol = self.stgy[player][infoset_id][i]
                     pol = self.last_stgy[player][infoset_id][i]
                     if pol <= 0:
-                        pol = 0.00000000000000000000000000000001
+                        pol = 0.00000000000001
                     if old_pol <= 0:
-                        old_pol = 0.00000000000000000000000000000001
+                        old_pol = 0.00000000000001
+                    pol = np.clip(pol, a_min=np.finfo(float).eps, a_max=None)
+                    old_pol = np.clip(old_pol, a_min=np.finfo(float).eps, a_max=None)
                     sum_vals += pol * np.log(pol / old_pol)
                     vals.append(pol * np.log(pol / old_pol))
                 for i, seq in enumerate(self.game.seqs[player][infoset_id]):
