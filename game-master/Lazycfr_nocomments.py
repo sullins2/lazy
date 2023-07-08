@@ -440,7 +440,7 @@ class LazyCFR:
                 for i, seq in enumerate(self.game.seqs[player][infoset_id]):
                     self.b[player][seq] += KL*(vals[i] - sum_vals)
 
-        eta = 10.0
+        eta = 20.0
         optimistic_gradient = self.opt[player] * self.grad[player] - self.last_opt[player] * self.last_gradient[player]
         self.last_gradient[player] = self.grad[player].copy()
         self.b[player] += eta * optimistic_gradient
