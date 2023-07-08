@@ -23,7 +23,7 @@ class LazyCFR:
         else:
             solver = RegretSolverPlus
 
-        self.AMMO = 200000 #12000
+        self.AMMO = 400000 #12000
 
         self.cfvCache = []
         self.cfvCache.append(list(map(lambda x: np.zeros(game.nactsOnHist[x]), range(game.numHists))))
