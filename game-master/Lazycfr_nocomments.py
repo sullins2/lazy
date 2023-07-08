@@ -103,8 +103,8 @@ class LazyCFR:
         self.nodestouched = 0
         self.outcome, self.reward = generateOutcome(game, self.stgy)
 
-        self.opt = [4.0, 4.0]
-        self.last_opt = [3.0, 3.0]
+        self.opt = [5.0, 5.0]
+        self.last_opt = [4.0, 4.0]
 
         self.grad = [np.zeros(self.AMMO), np.zeros(self.AMMO)]
         self.last_grad = [np.zeros(self.AMMO), np.zeros(self.AMMO)]
@@ -289,7 +289,7 @@ class LazyCFR:
 
 
         mod = self.round // 100
-        ent = -0.02 / (mod + 1)
+        ent = -0.08 / (mod + 1)
         # # ent = -0.1 / (np.log(self.round + 2.0))
         # self.nodestouched += len(self.visited[0])
         # self.nodestouched += len(self.visited[1])
@@ -429,10 +429,10 @@ class LazyCFR:
                 for i, seq in enumerate(self.game.seqs[player][infoset_id]):
                     old_pol = self.stgy[player][infoset_id][i]
                     pol = self.last_stgy[player][infoset_id][i]
-                    if pol <= 0:
-                        pol = 0.00000000000001
-                    if old_pol <= 0:
-                        old_pol = 0.00000000000001
+                    # if pol <= 0:
+                    #     pol = 0.00000000000001
+                    # if old_pol <= 0:
+                    #     old_pol = 0.00000000000001
                     pol = np.clip(pol, a_min=np.finfo(float).eps, a_max=None)
                     old_pol = np.clip(old_pol, a_min=np.finfo(float).eps, a_max=None)
                     sum_vals += pol * np.log(pol / old_pol)
