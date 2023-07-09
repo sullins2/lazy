@@ -91,7 +91,7 @@ def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 		expl_plot = []
 		expl_iters = []
 		ITERS = 1  # Total plot iterations
-		PLOT_ITERS = 1  # How often to record exploit for plotting
+		PLOT_ITERS = 10000000  # How often to record exploit for plotting
 		curexpl = 100
 		cumutime = 0
 		timestamp = time.time()
