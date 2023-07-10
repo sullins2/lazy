@@ -103,8 +103,8 @@ class LazyCFR:
         self.nodestouched = 0
         self.outcome, self.reward = generateOutcome(game, self.stgy)
 
-        self.opt = [5.0, 5.0]
-        self.last_opt = [4.0, 4.0]
+        self.opt = [3.0, 3.0]
+        self.last_opt = [2.0, 2.0]
 
         self.grad = [np.zeros(self.AMMO), np.zeros(self.AMMO)]
         self.last_grad = [np.zeros(self.AMMO), np.zeros(self.AMMO)]
@@ -289,7 +289,7 @@ class LazyCFR:
 
 
         mod = self.round // 100
-        ent = -0.07 / (mod + 1)
+        ent = -0.02 / (mod + 1)
         # # ent = -0.1 / (np.log(self.round + 2.0))
         # self.nodestouched += len(self.visited[0])
         # self.nodestouched += len(self.visited[1])
