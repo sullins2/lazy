@@ -86,7 +86,7 @@ printround=[10000, 8000, 6000, 4000, 2000, 100, 50, 200, 100, 50, 1, 1]
 
 def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 	# thres = -0.0045 #5  # Lazy-CFR uses 0.1 for larger games
-	thres = 0.0008 # ADDED 0
+	thres = 0.005 # ADDED 0
 	def solve(gamesolver, reporttime=60, timelim = 30000, minimum=0):
 		expl_plot = []
 		expl_iters = []
