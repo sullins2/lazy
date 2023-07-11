@@ -49,6 +49,7 @@ else:
 	betm = 8
 	game = Game( bidmaximum =betm) #path=savepath+".npz")#bidmaximum=betmpath=
 
+test = 1
 # This is for Kuhn - doesn't have betm..
 # if betm>7:
 # 	game = KuhnGame(path=savepath+".npz")
