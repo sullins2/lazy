@@ -289,7 +289,7 @@ class LazyCFR:
 
 
         mod = self.round // 100
-        ent = -0.008 / (mod + 1)
+        ent = 0 #-0.008 / (mod + 1)
         # # ent = -0.1 / (np.log(self.round + 2.0))
         # self.nodestouched += len(self.visited[0])
         # self.nodestouched += len(self.visited[1])
@@ -337,7 +337,7 @@ class LazyCFR:
         # self.total_entropy[0].append(self.stgy[0][4][0])
         # self.total_entropy[1].append(self.stgy[1][5][1])
 
-
+	print("VISITED: ", len(self.visited[0]))
         self.updateKomwu(0)
         self.updateKomwu(1)
         self.grad = [np.zeros(self.AMMO), np.zeros(self.AMMO)]
@@ -421,7 +421,7 @@ class LazyCFR:
     def updateKomwu(self, player):
 
         # This is the new KL bonus
-        KL = 0.5
+        KL = 0 #0.5
         if self.last_stgy[player] != None:
             vals = []
             for infoset_id in self.visited[player][::-1]:
