@@ -356,7 +356,7 @@ class LazyCFR:
         #         self.b[player] += eta * optimistic_gradient
         #         self.total = 1
         # for _ in range(1):
-        print("VISITED:", self.visited[0])
+        print("VISITED:", len(self.visited[0]))
         self.updateKomwu(0)
         self.updateKomwu(1)
         # self.last_gradient[0] = self.grad[0].copy()
