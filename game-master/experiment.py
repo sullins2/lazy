@@ -27,7 +27,7 @@ args = parser.parse_args()
 betm=1
 savepath = "leduc_3_"+str(betm)
 
-algo="cfr"
+# algo="cfr"
 # algo="lazycfr"
 # algo="komwu"
 # algo="lazyflbr"
@@ -46,7 +46,7 @@ dcfr_params = [1.5, 0.0, 2.0]
 if betm>7:
 	game = Game(path=savepath+".npz")
 else:
-	betm = 7
+	betm = 8
 	game = Game( bidmaximum =betm) #path=savepath+".npz")#bidmaximum=betmpath=
 
 # This is for Kuhn - doesn't have betm..
@@ -85,8 +85,11 @@ printround=[10000, 8000, 6000, 4000, 2000, 100, 50, 200, 100, 50, 1, 1]
 # CHECK EXPLOITABILITY CALC CODE
 
 def run(game, path="result", Type="regretmatching", solvername = "cfr"):
-	# thres = -0.0045 #5  # Lazy-CFR uses 0.1 for larger games
-	thres = 0.004
+	thres = -0.01 #5  # Lazy-CFR uses 0.1 for larger games
+	# TODO COMPARE WITH 0.04
+	#  0.05 works ok, but it doesn't get lower exploit very fast
+	#  0.04 is fast and exploit -> 0
+	#thres = 0.01 #0.008 #0.004
 	def solve(gamesolver, reporttime=60, timelim = 30000, minimum=0):
 		expl_plot = []
 		expl_iters = []
@@ -100,11 +103,11 @@ def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 		times = []
 		nodes = []
 		rounds = 0
-		z = 2
+		z = 1
 		lastexpl = 0.0
 		plot_its = []
 		stgy = None
-		Z = 20000
+		Z = 170
 		while z <= Z: #: 0000000: #cumutime + time.time() - timestamp < timelim or gamesolver.nodestouched < minimum:
 			z += 1
 			plot_its.append(z)

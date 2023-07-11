@@ -6,6 +6,8 @@ import utils
 from utils import RegretSolver, generateOutcome, exploitability, RegretSolverPlus, generateB, updateB, generateChildren
 import time
 from scipy.special import logsumexp
+import numexpr as ne
+
 
 
 class LazyCFR:
@@ -103,8 +105,11 @@ class LazyCFR:
         self.nodestouched = 0
         self.outcome, self.reward = generateOutcome(game, self.stgy)
 
-        self.opt = [4.0, 4.0]
-        self.last_opt = [3.0, 3.0]
+        self.opt = [2.0, 2.0]
+        self.last_opt = [1.0, 1.0]
+
+        self.total = 2
+        self.current = 0
 
         self.grad = [np.zeros(self.AMMO), np.zeros(self.AMMO)]
         self.last_grad = [np.zeros(self.AMMO), np.zeros(self.AMMO)]
@@ -114,7 +119,7 @@ class LazyCFR:
 
         self.seqs_updated = [np.zeros(self.AMMO), np.zeros(self.AMMO)]
 
-        self.K_j = [[None] * self.AMMO, [None] * self.AMMO]
+        self.K_j = [[0.0] * self.AMMO, [0.0] * self.AMMO]
         self.visited = [[],[]]
         self.last_visited = [[],[]]
         self.exp_y = [np.zeros(self.total_seqs[0] + 1),np.zeros(self.total_seqs[1] + 1)]
@@ -149,9 +154,9 @@ class LazyCFR:
 
         self.last_stgy = [None, None]
 
-    def receiveProb(self, owner, histind, prob):
-        self.probNotPassed[owner][histind] += prob
-        self.probNotUpdated[owner][histind] += prob
+    def receiveProb(self, owner, histind, prob, amount=1.0):
+        self.probNotPassed[owner][histind] += prob * amount
+        self.probNotUpdated[owner][histind] += prob * amount
         self.nodestouched += 1
 
     def passProbOnHist(self, owner, histind, last_seqs, true_owner):
@@ -199,7 +204,12 @@ class LazyCFR:
 
                     self.grad[owner][self.game.isetSuccSeq[owner][i1][i2]] += tmp[1 - owner] * self.reward[nxthind] * sign
 
-            self.receiveProb(owner, nxthind, tmp)
+
+            # self.receiveProb(owner, nxthind, tmp)
+            # if buildup:
+            self.receiveProb(owner, nxthind, tmp, 1.0)
+            # else:
+                # self.receiveProb(owner, nxthind, tmp, 1.0)
         self.probNotPassed[owner][histind] = np.zeros(2)
         self.histflag[owner][histind] = self.round
 
@@ -289,7 +299,7 @@ class LazyCFR:
 
 
         mod = self.round // 100
-        ent = -0.02 / (mod + 1)
+        ent = 0.0 #-0.04 / (mod + 1)
         # # ent = -0.1 / (np.log(self.round + 2.0))
         # self.nodestouched += len(self.visited[0])
         # self.nodestouched += len(self.visited[1])
@@ -337,9 +347,20 @@ class LazyCFR:
         # self.total_entropy[0].append(self.stgy[0][4][0])
         # self.total_entropy[1].append(self.stgy[1][5][1])
 
-
+        # self.total = 1
+        # for _ in range(self.total):
+        #     for player in range(2):
+        #         eta = 20.0
+        #         optimistic_gradient = self.opt[player] * self.grad[player] - self.last_opt[player] * self.last_gradient[player]
+        #         # self.last_gradient[player] = self.grad[player].copy()
+        #         self.b[player] += eta * optimistic_gradient
+        #         self.total = 1
+        # for _ in range(1):
+        print("VISITED:", self.visited[0])
         self.updateKomwu(0)
         self.updateKomwu(1)
+        # self.last_gradient[0] = self.grad[0].copy()
+        # self.last_gradient[1] = self.grad[1].copy()
         self.grad = [np.zeros(self.AMMO), np.zeros(self.AMMO)]
         self.visited = [[], []]
 
@@ -421,24 +442,27 @@ class LazyCFR:
     def updateKomwu(self, player):
 
         # This is the new KL bonus
-        KL = 1.0
+        mod = self.round // 100
+        KL = 0 #0.01 / (mod + 1) #1.0
         if self.last_stgy[player] != None:
             vals = []
             for infoset_id in self.visited[player][::-1]:
                 sum_vals = 0.0
                 for i, seq in enumerate(self.game.seqs[player][infoset_id]):
-                    old_pol = self.stgy[player][infoset_id][i]
-                    pol = self.last_stgy[player][infoset_id][i]
-                    if pol <= 0:
-                        pol = 0.00000000000001
-                    if old_pol <= 0:
-                        old_pol = 0.00000000000001
+                    pol = self.stgy[player][infoset_id][i]
+                    old_pol = self.last_stgy[player][infoset_id][i]
                     pol = np.clip(pol, a_min=np.finfo(float).eps, a_max=None)
                     old_pol = np.clip(old_pol, a_min=np.finfo(float).eps, a_max=None)
-                    sum_vals += pol * np.log(pol / old_pol)
-                    vals.append(pol * np.log(pol / old_pol))
+                    # p = np.clip(pol / old_pol, a_min=np.finfo(float).eps, a_max=None)
+                    # sum_vals += pol * np.log(pol / old_pol)
+                    # vals.append(pol * np.log(pol / old_pol))
+                    sum_vals += np.log(pol / old_pol)
+                    vals.append(np.log(pol / old_pol))
+                # print("SUMVALS:", sum_vals)
                 for i, seq in enumerate(self.game.seqs[player][infoset_id]):
-                    self.b[player][seq] += KL*(vals[i] - sum_vals)
+                    sign = -1.0 if player == 0 else 1.0
+                    # self.b[player][seq] += sign*KL*(vals[i] - sum_vals)
+                    self.b[player][seq] += sign * KL * vals[i] #sign * KL * (vals[i] - sum_vals)
 
         eta = 20.0
         optimistic_gradient = self.opt[player] * self.grad[player] - self.last_opt[player] * self.last_gradient[player]
@@ -469,55 +493,92 @@ class LazyCFR:
         if player == 0:
             self.opt_levels.append(self.opt[0])
 
-
+        y = np.zeros(self.total_seqs[player] + 1)
         for infoset_id in self.visited[player][::-1]:        #self.game.infoSets[player][::-1]:
             seq_values = []
             for i, seq in enumerate(self.game.seqs[player][infoset_id]):
                 child_values = []
                 if seq in self.game.childrenInfosets[player]:
                     for child_infoset in self.game.childrenInfosets[player][seq]:
-                        if self.K_j[player][child_infoset] == None:
-                            aff = 0.0
-                        else:
-                            aff = self.K_j[player][child_infoset]
-                        child_values.append(aff)
+                        # if self.K_j[player][child_infoset] == None:
+                        #     aff = 0.0
+                        # else:
+                        # aff = self.K_j[player][child_infoset]
+                        child_values.append(self.K_j[player][child_infoset]) #aff
                 seq_value = self.b[player][seq] + sum(child_values)
                 seq_values.append(seq_value)
                 # total_seq_values[seq] = seq_value ###
-                # exp_value[infoset_id] += self.stgy[player][infoset_id][i] * seq_value ##
             self.K_j[player][infoset_id] = logsumexp(seq_values)
-
+            # NEW BELOW
+            # ys = np.zeros(len(self.new_seqs[player][infoset_id]))
+            # for i, sequence_id in enumerate(self.new_seqs[player][infoset_id]):
+            #     ys[i] = self.b[player][sequence_id]
+            #     if sequence_id in self.game.childrenInfosets[player]:
+            #         child_sum = 0.0
+            #         for child in self.game.childrenInfosets[player][sequence_id]:
+            #             if self.K_j[player][child] == None:
+            #                 eff = 0
+            #             else:
+            #                 eff = self.K_j[player][child]
+            #             child_sum += eff #self.K_j[player][child]
+            #         ys[i] += child_sum
+            #     ys[i] -= self.K_j[player][infoset_id]
+            # bb = ne.evaluate('exp(ys)')
+            # summ = np.sum(bb)
+            # for ii, sequence_id in enumerate(self.new_seqs[player][infoset_id]):
+            #     self.stgy[player][infoset_id][ii] = bb[ii] / summ
 
         # print("SECOND PASS: ", self.game.infoSets[player])
         # This starts at the top and works downwards
         y = np.zeros(self.total_seqs[player] + 1)
         for infoset_id in self.visited[player]: #self.game.infoSets[player]:
             for sequence_id in self.new_seqs[player][infoset_id]:
-                if sequence_id in self.game.parSeq[player]:
-                    y_par = 0.0  # y[self.game.parSeq[player][sequence_id]] THIS GIVES BEHAVE POLICY BY COMMENTING OUT
-                else:
-                    y_par = 0.0
-                y[sequence_id] = y_par + self.b[player][sequence_id]
+                # if sequence_id in self.game.parSeq[player]:
+                #     y_par = 0.0  # y[self.game.parSeq[player][sequence_id]] THIS GIVES BEHAVE POLICY BY COMMENTING OUT
+                # else:
+                #     y_par = 0.0
+                y[sequence_id] = self.b[player][sequence_id] # + y_par
                 if sequence_id in self.game.childrenInfosets[player]:
                     child_sum = 0.0
                     for child in self.game.childrenInfosets[player][sequence_id]:
-                        if self.K_j[player][child] == None:
-                            eff = 0
-                        else:
-                            eff = self.K_j[player][child]
-                        child_sum += eff #self.K_j[player][child]
+                        # if self.K_j[player][child] == None:
+                        #     eff = 0
+                        # else:
+                        eff = self.K_j[player][child]
+                        child_sum += self.K_j[player][child] #self.K_j[player][child]
                     y[sequence_id] += child_sum
                 y[sequence_id] -= self.K_j[player][infoset_id]
 
 
+        # y_exp = np.e ** y # ne.evaluate('exp(y)')
+        # for infoset_id in self.visited[player]:  # self.game.infoSets[player]:
+        #     summ = 0.0
+        #     for sequence_id in self.new_seqs[player][infoset_id]:
+        #         summ += y_exp[sequence_id]
+        #     for ii, sequence_id in enumerate(self.new_seqs[player][infoset_id]):
+        #         self.stgy[player][infoset_id][ii] = y_exp[sequence_id] / summ
+
             # NORMALIZE POLICY HERE
+            # This is if doing it right away
             denom = 0.0
-            for sequence_id in self.new_seqs[player][infoset_id]:
-                self.exp_y[player][sequence_id] = np.exp(y[sequence_id])
-                denom += self.exp_y[player][sequence_id]
+            ys = np.zeros(len(self.new_seqs[player][infoset_id]))
             for ii, sequence_id in enumerate(self.new_seqs[player][infoset_id]):
-                # self.alpha = 1.0 - (1.0 / (self.round + 1.0) ** 2.0)
-                self.stgy[player][infoset_id][ii] = self.exp_y[player][sequence_id] / denom #+ (1.0-self.alpha)*(1.0 / len(self.new_seqs[player][infoset_id]))
+                ys[ii] = y[sequence_id]
+            b = ne.evaluate('exp(ys)')
+            b_sum = np.sum(b)
+            for ii, sequence_id in enumerate(self.new_seqs[player][infoset_id]):
+                self.stgy[player][infoset_id][ii] = b[ii] / b_sum #self.exp_y[player][sequence_id] / denom #+ (1.0-self.alpha)*(1.0 / len(self.new_seqs[player][infoset_id]))
+
+
+
+            # ORIGINAL - WORKING
+            # for sequence_id in self.new_seqs[player][infoset_id]:
+            #     # b = ne.evaluate('exp(a)')
+            #     self.exp_y[player][sequence_id] = np.exp(y[sequence_id])
+            #     denom += self.exp_y[player][sequence_id]
+            # for ii, sequence_id in enumerate(self.new_seqs[player][infoset_id]):
+            #     # self.alpha = 1.0 - (1.0 / (self.round + 1.0) ** 2.0)
+            #     self.stgy[player][infoset_id][ii] = self.exp_y[player][sequence_id] / denom #+ (1.0-self.alpha)*(1.0 / len(self.new_seqs[player][infoset_id]))
 
 
         # if player == 0:
