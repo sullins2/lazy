@@ -86,7 +86,7 @@ printround=[10000, 8000, 6000, 4000, 2000, 100, 50, 200, 100, 50, 1, 1]
 # CHECK EXPLOITABILITY CALC CODE
 
 def run(game, path="result", Type="regretmatching", solvername = "cfr"):
-	thres = 0.001 #5  # Lazy-CFR uses 0.1 for larger games
+	thres = 0.0005 #5  # Lazy-CFR uses 0.1 for larger games
 	# TODO COMPARE WITH 0.04
 	#  0.05 works ok, but it doesn't get lower exploit very fast
 	#  0.04 is fast and exploit -> 0
