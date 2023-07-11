@@ -103,8 +103,8 @@ class LazyCFR:
         self.nodestouched = 0
         self.outcome, self.reward = generateOutcome(game, self.stgy)
 
-        self.opt = [3.0, 3.0]
-        self.last_opt = [2.0, 2.0]
+        self.opt = [2.0, 2.0]
+        self.last_opt = [1.0, 1.0]
 
         self.grad = [np.zeros(self.AMMO), np.zeros(self.AMMO)]
         self.last_grad = [np.zeros(self.AMMO), np.zeros(self.AMMO)]
@@ -421,7 +421,7 @@ class LazyCFR:
     def updateKomwu(self, player):
 
         # This is the new KL bonus
-        KL = 1.0
+        KL = 0.5
         if self.last_stgy[player] != None:
             vals = []
             for infoset_id in self.visited[player][::-1]:
@@ -440,7 +440,7 @@ class LazyCFR:
                 for i, seq in enumerate(self.game.seqs[player][infoset_id]):
                     self.b[player][seq] += KL*(vals[i] - sum_vals)
 
-        eta = 15.0
+        eta = 10.0
         optimistic_gradient = self.opt[player] * self.grad[player] - self.last_opt[player] * self.last_gradient[player]
         self.last_gradient[player] = self.grad[player].copy()
         self.b[player] += eta * optimistic_gradient
