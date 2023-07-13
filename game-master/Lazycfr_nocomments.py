@@ -105,8 +105,8 @@ class LazyCFR:
         self.nodestouched = 0
         self.outcome, self.reward = generateOutcome(game, self.stgy)
 
-        self.opt = [2.0, 2.0]
-        self.last_opt = [1.0, 1.0]
+        self.opt = [4.0, 4.0]
+        self.last_opt = [3.0, 3.0]
 
         self.total = 2
         self.current = 0
@@ -451,7 +451,7 @@ class LazyCFR:
         # TODO see if beats 2.3, remember 2.0 is above
         mod = self.round // 100
         # 0.05 = 1.9m FOR SOME REASON 0.05 WORKS BUT NO OTHER VALUES DO, PROB MOVE ON FROM THIS
-        KL = 0 #0.03 / (mod + 1) #1.0
+        KL = 1.0 #0.03 / (mod + 1) #1.0
         if self.last_stgy[player] != None:
             vals = []
             for infoset_id in self.visited[player][::-1]:
