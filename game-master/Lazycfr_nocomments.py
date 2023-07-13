@@ -291,7 +291,7 @@ class LazyCFR:
         self.updateIset(0, 0, [[], [], [], [], [], [], [], []])
         self.updateIset(1, 0, [[], [], [], [], [], [], [], []])
 
-        self.getAveragePolicy()
+        self.getAveragePolicy() 
 
         # grad0 = generateB(game,self.stgy_prof, 0)
         # grad1 = generateB(game,self.stgy_prof, 1)
