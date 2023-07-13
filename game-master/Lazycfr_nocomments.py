@@ -47,7 +47,7 @@ class LazyCFR:
         self.reachp = [np.zeros(game.numIsets[0]), np.zeros(game.numIsets[1])]
 
         self.b = [np.zeros(self.AMMO), np.zeros(self.AMMO)]
-        # self.b = [np.ones(self.AMMO), np.ones(self.AMMO)]
+        # self.b = [np.ones(self.AMMO) * 5.0, np.ones(self.AMMO) * 5.0]
 
         self.seqCount = [np.zeros(self.AMMO), np.zeros(self.AMMO)]
         self.seqCountFlag = [np.zeros(self.AMMO), np.zeros(self.AMMO)]
@@ -298,8 +298,8 @@ class LazyCFR:
         # self.grad = [np.array(grad0), np.array(grad1)]
 
 
-        mod = self.round // 100
-        ent = 0.0 #-0.04 / (mod + 1)
+        mod = self.round // 50
+        ent = -0.12 / (mod + 1) # was 4
         # # ent = -0.1 / (np.log(self.round + 2.0))
         # self.nodestouched += len(self.visited[0])
         # self.nodestouched += len(self.visited[1])
@@ -315,10 +315,11 @@ class LazyCFR:
                     pol = 0.00000000000000000000000000000001
                 sum_vals += pol * np.log(pol)
                 total_entropy0 += pol * np.log(pol)
-                vals.append(np.log(pol))
+                vals.append(2.0*np.log(pol))
             for i, seq in enumerate(self.game.seqs[0][infoset_id]):
                 self.b[0][seq] += ent*(vals[i] - sum_vals)
 
+        # TODO vals.append(2.0*np.log(pol)) works well
 
         for infoset_id in self.visited[1][::-1]:
             vals = []
@@ -329,7 +330,7 @@ class LazyCFR:
                     pol = 0.00000000000000000000000000000001
                 sum_vals += pol * np.log(pol)
                 total_entropy1 += pol * np.log(pol)
-                vals.append(np.log(pol))
+                vals.append(2.0*np.log(pol)) # SEEING IF MORE POLS IN FRONT DOES ANYTHING
             for i, seq in enumerate(self.game.seqs[1][infoset_id]):
                 self.b[1][seq] += ent*(vals[i] - sum_vals)
 
@@ -356,7 +357,7 @@ class LazyCFR:
         #         self.b[player] += eta * optimistic_gradient
         #         self.total = 1
         # for _ in range(1):
-        print("VISITED:", len(self.visited[0]))
+        # print("VISITED:", len(self.visited[0]))
         self.updateKomwu(0)
         self.updateKomwu(1)
         # self.last_gradient[0] = self.grad[0].copy()
@@ -385,6 +386,11 @@ class LazyCFR:
         #         self.reward[hist] += _stgy[a] * self.reward[nh]
         #
         # updateoutcome(0)
+
+        # amount = 100.0 / 50.0
+        # if self.round == 50:
+        #     self.b[0] -= 5.0 #amount
+        #     self.b[1] -= 5.0 #amount
 
         self.time += time.time() - t1
         return self.stgy
@@ -442,8 +448,10 @@ class LazyCFR:
     def updateKomwu(self, player):
 
         # This is the new KL bonus
+        # TODO see if beats 2.3, remember 2.0 is above
         mod = self.round // 100
-        KL = 0 #0.01 / (mod + 1) #1.0
+        # 0.05 = 1.9m FOR SOME REASON 0.05 WORKS BUT NO OTHER VALUES DO, PROB MOVE ON FROM THIS
+        KL = 0 #0.03 / (mod + 1) #1.0
         if self.last_stgy[player] != None:
             vals = []
             for infoset_id in self.visited[player][::-1]:
@@ -456,12 +464,15 @@ class LazyCFR:
                     # p = np.clip(pol / old_pol, a_min=np.finfo(float).eps, a_max=None)
                     # sum_vals += pol * np.log(pol / old_pol)
                     # vals.append(pol * np.log(pol / old_pol))
-                    sum_vals += np.log(pol / old_pol)
+                    # TODO best results are how they are
+                    sum_vals += np.log(pol / old_pol) # 3.27 was with just vals[i] below
                     vals.append(np.log(pol / old_pol))
                 # print("SUMVALS:", sum_vals)
                 for i, seq in enumerate(self.game.seqs[player][infoset_id]):
+                    # TODO see if sign matters - it did 3.5 as 1.0
+                    #  next try change sign
                     sign = -1.0 if player == 0 else 1.0
-                    # self.b[player][seq] += sign*KL*(vals[i] - sum_vals)
+                    # self.b[player][seq] += sign * KL * (vals[i] - sum_vals)
                     self.b[player][seq] += sign * KL * vals[i] #sign * KL * (vals[i] - sum_vals)
 
         eta = 20.0
@@ -470,7 +481,6 @@ class LazyCFR:
         self.b[player] += eta * optimistic_gradient
         self.last_opt[player] = self.opt[player] - 1.0
 
-        c = 0
         # Computes KL Divergence of current policy and last policy
         # sum_vals = 0.0
         # if self.last_stgy[player] != None:
