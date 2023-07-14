@@ -300,7 +300,7 @@ class LazyCFR:
 
 
         mod = self.round // 100
-        ent = -0.05 / (mod + 1) # was 4
+        ent = -0.07 / (mod + 1) # was 4
         # # ent = -0.1 / (np.log(self.round + 2.0))
         # self.nodestouched += len(self.visited[0])
         # self.nodestouched += len(self.visited[1])
@@ -316,7 +316,7 @@ class LazyCFR:
                     pol = 0.00000000000000000000000000000001
                 sum_vals += pol * np.log(pol)
                 total_entropy0 += pol * np.log(pol)
-                vals.append(2.0*np.log(pol))
+                vals.append(1.0*np.log(pol))
             for i, seq in enumerate(self.game.seqs[0][infoset_id]):
                 self.b[0][seq] += ent*(vals[i] - sum_vals)
 
@@ -331,7 +331,7 @@ class LazyCFR:
                     pol = 0.00000000000000000000000000000001
                 sum_vals += pol * np.log(pol)
                 total_entropy1 += pol * np.log(pol)
-                vals.append(2.0*np.log(pol)) # SEEING IF MORE POLS IN FRONT DOES ANYTHING
+                vals.append(1.0*np.log(pol)) # SEEING IF MORE POLS IN FRONT DOES ANYTHING
             for i, seq in enumerate(self.game.seqs[1][infoset_id]):
                 self.b[1][seq] += ent*(vals[i] - sum_vals)
 
