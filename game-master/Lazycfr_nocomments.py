@@ -316,7 +316,7 @@ class LazyCFR:
                     pol = 0.00000000000000000000000000000001
                 sum_vals += pol * np.log(pol)
                 total_entropy0 += pol * np.log(pol)
-                vals.append(1.0*np.log(pol))
+                vals.append(2.0*np.log(pol))
             for i, seq in enumerate(self.game.seqs[0][infoset_id]):
                 self.b[0][seq] += ent*(vals[i] - sum_vals)
 
@@ -331,7 +331,7 @@ class LazyCFR:
                     pol = 0.00000000000000000000000000000001
                 sum_vals += pol * np.log(pol)
                 total_entropy1 += pol * np.log(pol)
-                vals.append(1.0*np.log(pol)) # SEEING IF MORE POLS IN FRONT DOES ANYTHING
+                vals.append(2.0*np.log(pol)) # SEEING IF MORE POLS IN FRONT DOES ANYTHING
             for i, seq in enumerate(self.game.seqs[1][infoset_id]):
                 self.b[1][seq] += ent*(vals[i] - sum_vals)
 
@@ -452,7 +452,7 @@ class LazyCFR:
         # TODO see if beats 2.3, remember 2.0 is above
         mod = self.round // 100
         # 0.05 = 1.9m FOR SOME REASON 0.05 WORKS BUT NO OTHER VALUES DO, PROB MOVE ON FROM THIS
-        KL = 1.0 #0.03 / (mod + 1) #1.0
+        KL = 0.0 #1.0 #0.03 / (mod + 1) #1.0
         if self.last_stgy[player] != None:
             vals = []
             for infoset_id in self.visited[player][::-1]:
