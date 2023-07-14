@@ -92,6 +92,7 @@ params["optimism"] = 2.0
 params["eta"] = 20.0
 
 
+
 def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 	thres = params["thres"]
 	# TODO THIS IS WITHOUT ANY ENT OR KL
