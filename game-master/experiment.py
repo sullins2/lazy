@@ -85,11 +85,12 @@ printround=[10000, 8000, 6000, 4000, 2000, 100, 50, 200, 100, 50, 1, 1]
 # CHECK EXPLOITABILITY CALC CODE
 
 # KL=0.05, ent=-0.1 got TIME:  1602.340113401413 EXPLOIT:  0.0010151638885595596 nodestouched: 28177758
+# KL=0.10, ent=-0.1 got TIME:  2008.6525464057922 EXPLOIT:  0.005799684139134552 nodestouched: 17664282 
 
 params = {}
 params["thres"] = 0.008
 params["entropy"] = -0.1
-params["KL"] = 0.1
+params["KL"] = 0.15
 params["optimism"] = 2.0
 params["eta"] = 20.0
 params["entropy_twice"] = True
