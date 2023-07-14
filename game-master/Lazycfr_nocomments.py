@@ -299,8 +299,8 @@ class LazyCFR:
         # self.grad = [np.array(grad0), np.array(grad1)]
 
 
-        mod = self.round // 100
-        ent = -0.07 / (mod + 1) # was 4
+        mod = self.round // 50
+        ent = -0.12 / (mod + 1) # was 4
         # # ent = -0.1 / (np.log(self.round + 2.0))
         # self.nodestouched += len(self.visited[0])
         # self.nodestouched += len(self.visited[1])
@@ -452,7 +452,7 @@ class LazyCFR:
         # TODO see if beats 2.3, remember 2.0 is above
         mod = self.round // 100
         # 0.05 = 1.9m FOR SOME REASON 0.05 WORKS BUT NO OTHER VALUES DO, PROB MOVE ON FROM THIS
-        KL = 1.0 #0.03 / (mod + 1) #1.0
+        KL = 0.05 #0.03 / (mod + 1) #1.0
         if self.last_stgy[player] != None:
             vals = []
             for infoset_id in self.visited[player][::-1]:
