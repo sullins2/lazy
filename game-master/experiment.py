@@ -46,7 +46,7 @@ dcfr_params = [1.5, 0.0, 2.0]
 if betm>7:
 	game = Game(path=savepath+".npz")
 else:
-	betm = 6
+	betm = 7
 	game = Game( bidmaximum =betm) #path=savepath+".npz")#bidmaximum=betmpath=
 
 # This is for Kuhn - doesn't have betm..
@@ -90,8 +90,9 @@ params["entropy"] = -0.1
 params["KL"] = 0.05
 params["optimism"] = 2.0
 params["eta"] = 20.0
+params["entropy_twice"] = True
 
-
+print("params: ", params)
 
 def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 	thres = params["thres"]

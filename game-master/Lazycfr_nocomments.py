@@ -20,6 +20,7 @@ class LazyCFR:
         self.opt = [params["optimism"], params["optimism"]]
         self.last_opt = [params["optimism"] - 1.0, params["optimism"] - 1.0]
         self.eta = params["eta"]
+        self.entropy_twice = params["entropy_twice"]
 
         self.time = 0
 
@@ -151,8 +152,7 @@ class LazyCFR:
             else:
                 self.sumstgy[1].append(np.ones(0))
 
-        # self.init()
-        # print("INIT DONE")
+
         b0 = generateChildren(game, self.stgy, 0)
         # print("CHILDREN0:", b0)
         b1 = generateChildren(game, self.stgy, 1)
@@ -306,7 +306,8 @@ class LazyCFR:
 
 
         mod = self.round // 100
-        ent = self.entropy / (mod + 1) # was 4
+        ent = self.entropy / (mod + 1)
+        ent_twice = 2.0 if self.entropy_twice else 1.0
         total_entropy0 = 0.0
         total_entropy1 = 0.0
 
@@ -317,10 +318,9 @@ class LazyCFR:
                 pol = self.stgy[0][infoset_id][i]
                 if pol <= 0:
                     pol = 0.00000000000000000000000000000001
-                sum_vals += pol * np.log(2.0*pol)
+                sum_vals += pol * np.log(pol)
                 total_entropy0 += pol * np.log(pol)
-                vals.append(2.0 * np.log(pol))
-                # vals.append(2.0 * np.log(pol ** (2.0)))
+                vals.append(ent_twice * np.log(pol))
             for i, seq in enumerate(self.game.seqs[0][infoset_id]):
                 self.b[0][seq] += ent*(vals[i] - sum_vals)
 
@@ -333,10 +333,9 @@ class LazyCFR:
                 pol = self.stgy[1][infoset_id][i]
                 if pol <= 0:
                     pol = 0.00000000000000000000000000000001
-                sum_vals += pol * np.log(2.0*pol)
+                sum_vals += pol * np.log(pol)
                 total_entropy1 += pol * np.log(pol)
-                vals.append(2.0 * np.log(pol))
-                # vals.append(2.0*np.log(pol ** (2.0)))
+                vals.append(ent_twice * np.log(pol))
             for i, seq in enumerate(self.game.seqs[1][infoset_id]):
                 self.b[1][seq] += ent*(vals[i] - sum_vals)
 
@@ -449,12 +448,10 @@ class LazyCFR:
                     old_pol = self.last_stgy[player][infoset_id][i]
                     pol = np.clip(pol, a_min=np.finfo(float).eps, a_max=None)
                     old_pol = np.clip(old_pol, a_min=np.finfo(float).eps, a_max=None)
-                    # p = np.clip(pol / old_pol, a_min=np.finfo(float).eps, a_max=None)
                     # sum_vals += pol * np.log(pol / old_pol)
                     # vals.append(pol * np.log(pol / old_pol))
                     sum_vals += np.log(pol / old_pol)
                     vals.append(np.log(pol / old_pol))
-                # print("SUMVALS:", sum_vals)
                 for i, seq in enumerate(self.game.seqs[player][infoset_id]):
                     sign = -1.0 if player == 0 else 1.0
                     # self.b[player][seq] += sign * KL * (vals[i] - sum_vals)
@@ -466,29 +463,12 @@ class LazyCFR:
         self.b[player] += self.eta * optimistic_gradient
         self.last_opt[player] = self.opt[player] - 1.0
 
-        # Computes KL Divergence of current policy and last policy
-        # sum_vals = 0.0
-        # if self.last_stgy[player] != None:
-        #     for infoset_id in self.visited[player][::-1]:
-        #         for i, seq in enumerate(self.game.seqs[player][infoset_id]):
-        #             pol = self.stgy[player][infoset_id][i]
-        #             old_pol = self.last_stgy[player][infoset_id][i]
-        #             if pol <= 0:
-        #                 pol = 0.00000000000000000000000000000001
-        #             if old_pol <= 0:
-        #                 old_pol = 0.00000000000000000000000000000001
-        #             sum_vals += pol * np.log(pol/old_pol)
-        #             # sum_vals += pol * np.log(pol)
-        #             # vals.append(np.log(pol))
-        #         # for i, seq in enumerate(self.game.seqs[1][infoset_id]):
-        #         #     self.b[1][seq] += ent*(vals[i] - sum_vals)
-
         self.last_stgy[player] = copy.deepcopy(self.stgy[player])
         if player == 0:
             self.opt_levels.append(self.opt[0])
 
         y = np.zeros(self.total_seqs[player] + 1)
-        for infoset_id in self.visited[player][::-1]:        #self.game.infoSets[player][::-1]:
+        for infoset_id in self.visited[player][::-1]:
             seq_values = []
             for i, seq in enumerate(self.game.seqs[player][infoset_id]):
                 child_values = []
@@ -655,54 +635,54 @@ class LazyCFR:
 
 
 
-    def init(self):
-        copy_thres = self.thres
-        self.thres = -100000.0
-        game = self.game
-        self.round += 1
-        if self.Type == "regretmatching":
-            self.reachp[0][0] += 1  # These are set to zero in line just above so only ever have values 0 or 1
-            self.reachp[1][0] += 1
-        else:
-            self.reachp[0][0] += self.round
-            self.reachp[1][0] += self.round
-        self.receiveProb(0, 0, np.ones(2))  # These set probNotPass and probNotUpdate for history
-        self.receiveProb(1, 0,
-                         np.ones(2))  # to all 1 as in: probNotPassed before:  [0. 0.] prob not passed after:  [1. 1.]
-        self.updateIset(0, 0, [[], []])
-        self.updateIset(1, 0, [[], []])
-
-
-        def updateoutcome(hist):
-            if game.isTerminal[hist]:
-                return
-            if self.histflag[0][hist] < self.round:
-                # print("HISTFLAG LOWER: ", hist)
-                return
-            self.reward[hist] = 0.0
-            nacts = game.nactsOnHist[hist]
-            _stgy = None
-            player = game.playerOfHist[hist]
-            if player == 2:
-                _stgy = game.chanceprob[hist]
-            else:
-                piset = game.Hist2Iset[player][hist]
-                _stgy = self.solvers[player][piset].curstgy  # self.stgy[player][piset]
-            for a in range(nacts):
-                nh = game.histSucc[hist][a]
-                updateoutcome(nh)
-                self.outcome[hist][a] = self.reward[nh]
-                self.reward[hist] += _stgy[a] * self.reward[nh]
-
-        updateoutcome(0)
-
-        self.updateKomwu(0)
-        self.updateKomwu(1)
-        self.grad = [np.zeros(12), np.zeros(12)]
-        self.last_last_gradient = [np.zeros(12), np.zeros(12)]
-
-        self.visited = [[], []]
-        self.thres = copy_thres
+    # def init(self):
+    #     copy_thres = self.thres
+    #     self.thres = -100000.0
+    #     game = self.game
+    #     self.round += 1
+    #     if self.Type == "regretmatching":
+    #         self.reachp[0][0] += 1  # These are set to zero in line just above so only ever have values 0 or 1
+    #         self.reachp[1][0] += 1
+    #     else:
+    #         self.reachp[0][0] += self.round
+    #         self.reachp[1][0] += self.round
+    #     self.receiveProb(0, 0, np.ones(2))  # These set probNotPass and probNotUpdate for history
+    #     self.receiveProb(1, 0,
+    #                      np.ones(2))  # to all 1 as in: probNotPassed before:  [0. 0.] prob not passed after:  [1. 1.]
+    #     self.updateIset(0, 0, [[], []])
+    #     self.updateIset(1, 0, [[], []])
+    #
+    #
+    #     def updateoutcome(hist):
+    #         if game.isTerminal[hist]:
+    #             return
+    #         if self.histflag[0][hist] < self.round:
+    #             # print("HISTFLAG LOWER: ", hist)
+    #             return
+    #         self.reward[hist] = 0.0
+    #         nacts = game.nactsOnHist[hist]
+    #         _stgy = None
+    #         player = game.playerOfHist[hist]
+    #         if player == 2:
+    #             _stgy = game.chanceprob[hist]
+    #         else:
+    #             piset = game.Hist2Iset[player][hist]
+    #             _stgy = self.solvers[player][piset].curstgy  # self.stgy[player][piset]
+    #         for a in range(nacts):
+    #             nh = game.histSucc[hist][a]
+    #             updateoutcome(nh)
+    #             self.outcome[hist][a] = self.reward[nh]
+    #             self.reward[hist] += _stgy[a] * self.reward[nh]
+    #
+    #     updateoutcome(0)
+    #
+    #     self.updateKomwu(0)
+    #     self.updateKomwu(1)
+    #     self.grad = [np.zeros(12), np.zeros(12)]
+    #     self.last_last_gradient = [np.zeros(12), np.zeros(12)]
+    #
+    #     self.visited = [[], []]
+    #     self.thres = copy_thres
 
 
 
