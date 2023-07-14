@@ -299,8 +299,8 @@ class LazyCFR:
         # self.grad = [np.array(grad0), np.array(grad1)]
 
 
-        mod = self.round // 50
-        ent = -0.12 / (mod + 1) # was 4
+        mod = self.round // 100
+        ent = -0.07 / (mod + 1) # was 4
         # # ent = -0.1 / (np.log(self.round + 2.0))
         # self.nodestouched += len(self.visited[0])
         # self.nodestouched += len(self.visited[1])
