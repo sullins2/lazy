@@ -39,22 +39,21 @@ Type = "dcfr"
 dcfr_params = [1.5, 0.0, 2.0]
 
 
-# TODO check exploit calc code
 
+# TODO put all hyperparameters in a file to read in
 
 # This is for all Leduc
 if betm>7:
 	game = Game(path=savepath+".npz")
 else:
-	betm = 7
+	betm = 6
 	game = Game( bidmaximum =betm) #path=savepath+".npz")#bidmaximum=betmpath=
 
-test = 1
 # This is for Kuhn - doesn't have betm..
 # if betm>7:
 # 	game = KuhnGame(path=savepath+".npz")
 # else:
-# 	game = KuhnGame( bidmaximum =betm)#path=savepath+".npz")#bidmaximum=betmpath=
+# 	game = KuhnGame( bidmaximum =betm)
 
 # print("-----------------------------")
 # print(game.infoSets[0])
@@ -85,14 +84,21 @@ printround=[10000, 8000, 6000, 4000, 2000, 100, 50, 200, 100, 50, 1, 1]
 
 # CHECK EXPLOITABILITY CALC CODE
 
+params = {}
+params["thres"] = 0.008
+params["entropy"] = -0.1
+params["KL"] = 0.05
+params["optimism"] = 2.0
+params["eta"] = 20.0
+
+
 def run(game, path="result", Type="regretmatching", solvername = "cfr"):
-	thres = 0.008 #5  # Lazy-CFR uses 0.1 for larger games
+	thres = params["thres"]
 	# TODO THIS IS WITHOUT ANY ENT OR KL
 	#  BETM=3 max=0.04
 	#  BETM=4 max=0.01
 	#  BETM=5 max=0.01-0.008
 	#  BETM=6
-	#thres = 0.01 #0.008 #0.004
 	def solve(gamesolver, reporttime=60, timelim = 30000, minimum=0):
 		expl_plot = []
 		expl_iters = []
@@ -199,7 +205,7 @@ def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 	if solvername == "mccfr":
 		solver = mccfr.MCCFR(game, Type=Type)
 	if solvername == "lazycfr_nocomments": # THIS IS KOMWU
-		solver = Lazycfr_nocomments.LazyCFR(game, Type=Type, thres=thres)
+		solver = Lazycfr_nocomments.LazyCFR(game, Type=Type, thres=thres, params=params)
 	if solvername == "lazycfr":
 		solver = Lazycfr.LazyCFR(game, Type=Type, thres=thres, params=dcfr_params)
 	if solvername == "lazyflbr":
