@@ -8,7 +8,8 @@ import time
 from scipy.special import logsumexp
 import numexpr as ne
 
-
+# TRY WITHOUT KL
+# TRY WITHOUT 2.0*log
 
 class LazyCFR:
     def __init__(self, game, Type="regretmatching", thres=0.0):
