@@ -89,8 +89,8 @@ printround=[10000, 8000, 6000, 4000, 2000, 100, 50, 200, 100, 50, 1, 1]
 # KL=0.15, ent=-0.1 got TIME:  2043.886778831482 EXPLOIT:  0.0021964411087307765 nodestouched: 21637370
 
 params = {}
-params["thres"] = 0.01
-params["entropy"] = -0.1
+params["thres"] = 0.009
+params["entropy"] = -0.08
 params["KL"] = 0.05
 params["optimism"] = 2.0
 params["eta"] = 20.0
