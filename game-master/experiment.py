@@ -90,7 +90,7 @@ printround=[10000, 8000, 6000, 4000, 2000, 100, 50, 200, 100, 50, 1, 1]
 
 params = {}
 params["thres"] = 0.009
-params["entropy"] = -0.08
+params["entropy"] = -0.15
 params["KL"] = 0.05
 params["optimism"] = 2.0
 params["eta"] = 20.0
