@@ -98,7 +98,6 @@ params["eta"] = 20.0
 params["entropy_twice"] = False
 params["final_exploit"] = 1e-12
 params["AMMO"] = 500000
-# THESE SETTINGS GOT 4.84m
 
 # TRY WITH MOD 50: KL = 1, KL = 0.5, entropy_twice=False
 print("params: ", params)
