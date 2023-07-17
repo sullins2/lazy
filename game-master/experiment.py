@@ -33,9 +33,9 @@ savepath = "leduc_3_"+str(betm)
 # algo="lazyflbr"
 algo="lazycfr_nocomments"  # This is KOMWU
 
-# Type = "regretmatching"
+Type = "regretmatching"
 # Type = "regretmatchingplus"
-Type = "dcfr"
+# Type = "dcfr"
 dcfr_params = [1.5, 0.0, 2.0]
 
 
@@ -46,7 +46,7 @@ dcfr_params = [1.5, 0.0, 2.0]
 if betm>7:
 	game = Game(path=savepath+".npz")
 else:
-	betm = 7
+	betm = 6
 	game = Game( bidmaximum =betm) #path=savepath+".npz")#bidmaximum=betmpath=
 
 # This is for Kuhn - doesn't have betm..
@@ -84,15 +84,25 @@ printround=[10000, 8000, 6000, 4000, 2000, 100, 50, 200, 100, 50, 1, 1]
 
 # CHECK EXPLOITABILITY CALC CODE
 
+
+
 params = {}
-params["thres"] = 0.008
-params["entropy"] = -0.1
-params["KL"] = 0.05
+params["thres"] = 0.008 #0.004#0.01 #0.06
+# TODO PUT THIS BACK AND SEE HOW FAR IT GOES DOWN
+params["entropy"] = -0.85
+params["mod_value"] = 100
+params["KL"] = 0 #-0.05
+params["KL_mod"] = 10
 params["optimism"] = 2.0
 params["eta"] = 20.0
-params["entropy_twice"] = True
+params["entropy_twice"] = False
+params["final_exploit"] = 1e-12
+params["AMMO"] = 500000
+# THESE SETTINGS GOT 4.84m
 
+# TRY WITH MOD 50: KL = 1, KL = 0.5, entropy_twice=False
 print("params: ", params)
+# TODO CHECK IF THESE FIXES DO ANYTHING IN NFGs FOR OMWU
 
 def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 	thres = params["thres"]
@@ -118,7 +128,8 @@ def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 		lastexpl = 0.0
 		plot_its = []
 		stgy = None
-		Z = 1300
+		quit = False
+		Z = 13000
 		while z <= Z: #: 0000000: #cumutime + time.time() - timestamp < timelim or gamesolver.nodestouched < minimum:
 			z += 1
 			plot_its.append(z)
@@ -127,11 +138,12 @@ def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 				curexpl = gamesolver.getExploitability()
 				expl_plot.append(curexpl)
 				expl_iters.append(solver.nodestouched)
-				if curexpl < 0.01:
+				if curexpl < params["final_exploit"] and quit == False:
 					cumutime += time.time() - timestamp
 					print("TIME: ", cumutime, "EXPLOIT: ", curexpl, "nodestouched:", gamesolver.nodestouched)
-					z = Z + 1
-				# ITERS += 1
+					z = Z - 10
+					quit = True
+				ITERS += 1
 			if z % 300 == 0: #rounds % printround[betm]== 0:
 				curexpl = gamesolver.getExploitability()
 				# print(solver.mike[0]) #
@@ -147,7 +159,7 @@ def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 				cumutime += time.time() - timestamp
 				expl = gamesolver.getExploitability()
 				tmpresult = (expl, cumutime, gamesolver.nodestouched)
-				print("solvername", solvername, Type, "game", savepath, "expl", expl, "time", cumutime, "nodestouched", gamesolver.nodestouched, "thres", thres, "rounds", rounds)
+				print("solvername", solvername, Type, "game", savepath, "betm", betm, "expl", expl, "time", cumutime, "nodestouched", gamesolver.nodestouched, "thres", thres, "rounds", rounds)
 				result.append(tmpresult)
 				expls.append(expl)
 				times.append(cumutime)
@@ -161,7 +173,23 @@ def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 				# np.savez(res_path, expl = expls, times = times, nodes = nodes)
 
 		# Plot exploitability
-		plt.plot(expl_iters, expl_plot, 'b-', label='Lazy-KFLBR')
+		# for i in range(10, 0, -1):
+		# 	print("EXL:", expl_plot[-i])
+		# print("EXPLOTS:", expl_plot[-1])
+
+		# LOG PLOT (NOT WORKING)
+		# plt.xlabel('Nodes Touched')
+		# plt.ylabel('Exploitability')
+		# plt.xscale('log')  # Set x-axis to log scale
+		# plt.yscale('log')  # Set y-axis to log scale
+		# This breaks the plot
+		# plt.xlim(1e0, 1e5)  # Set x-axis range from 1 to 10^5
+		# plt.ylim(1e-12, 1e1)  # Set y-axis range from 10^-12 to 1
+		# plt.plot(expl_iters, expl_plot, 'b-', label='Lazy-KFLBR')
+		# plt.legend()
+		# plt.show()
+
+		plt.plot(expl_iters, expl_plot, 'b-', label='None')
 		plt.xlabel('Nodes Touched')
 		plt.ylabel('Exploitability')
 		plt.ylim(0.0, 1.0)  # Set y-axis range
@@ -193,9 +221,15 @@ def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 		# 			 textcoords='offset points', arrowprops=dict(arrowstyle='->'))
 		# plt.show()
 
-		print("shape", len(expls), len(times), len(nodes))
-		# print("HERE: ", stgy)
 		expl = gamesolver.getExploitability()
+		print("Last expl:", expl)
+
+		print("shape", len(expls), len(times), len(nodes))
+		print("HERE: ", gamesolver.stgy[0])
+		print("JACK:", gamesolver.stgy[0][4][0], "OTHER:", gamesolver.stgy[0][20][0], "JACK+0.3333", gamesolver.stgy[0][4][0] + 0.33333333 )
+		print("DIF: ", np.abs(gamesolver.stgy[0][4][0] + 0.333333333333333333 - gamesolver.stgy[0][20][0]))
+
+
 		return (expls, times, nodes, stgy, expl)
 	print("initializing solver")
 	solver = None

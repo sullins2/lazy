@@ -258,7 +258,7 @@ def generateOutcome(game, stgy_prof):
 def generateOutcomeFinal(game, stgy_prof):
 	outcome = np.zeros(game.numHists).tolist()
 	rew = np.zeros(game.numHists)
-	print("GENERATE OUTCOME")
+	print("GENERATE OUTCOME FINAL")
 	def solve(hist):
 		# all this does is returns the reward
 		if game.isTerminal[hist]:
