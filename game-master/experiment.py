@@ -46,7 +46,7 @@ dcfr_params = [1.5, 0.0, 2.0]
 if betm>7:
 	game = Game(path=savepath+".npz")
 else:
-	betm = 8
+	betm = 7
 	game = Game( bidmaximum =betm) #path=savepath+".npz")#bidmaximum=betmpath=
 
 # This is for Kuhn - doesn't have betm..
@@ -87,7 +87,7 @@ printround=[10000, 8000, 6000, 4000, 2000, 100, 50, 200, 100, 50, 1, 1]
 
 
 params = {}
-params["thres"] = 0.0005 #0.004#0.01 #0.06
+params["thres"] = 0.0006 #0.004#0.01 #0.06
 # TODO PUT THIS BACK AND SEE HOW FAR IT GOES DOWN
 params["entropy"] = -10.0
 params["mod_value"] = 10000
