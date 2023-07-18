@@ -445,7 +445,7 @@ class LazyCFR:
                     sign = -1.0 if player == 0 else 1.0
                     # self.b[player][seq] += sign * KL * (vals[i] - sum_vals)
                     # self.b[player][seq] += sign * KL * vals[i] #sign * KL * (vals[i] - sum_vals)
-                    self.b[player][seq] += KL * sum_vals
+                    self.b[player][seq] += KL * sum_vals 
 
         optimistic_gradient = self.opt[player] * self.grad[player] - self.last_opt[player] * self.last_gradient[player]
         self.last_gradient[player] = self.grad[player].copy()
