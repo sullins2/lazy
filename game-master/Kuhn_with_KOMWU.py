@@ -336,7 +336,7 @@ class KuhnGame:
                                 #     f = 1.0 / 10000.0
                                 # else:
                                 #     f = 1.0 / 2.0
-                                self.chanceprob[int(self.numHists)][_a] = 1.0  / 2.0
+                                self.chanceprob[int(self.numHists)][_a] = 1.0  / (self.cards - 1.0)
                                 # print("Setting chance prob to: ", 1.0 / 2.0)
                                 # print("FFFFF: ", _a)
                     # else:
@@ -404,9 +404,13 @@ class KuhnGame:
                             if int(bids[0]) == 1:
                                 self.reward[int(histids[i][j])] = (2.0, -2.0)
                                 # print("Reward 2")
-                            if int(bids[0]) == -1:
+                            elif int(bids[0]) == -1:
                                 self.reward[int(histids[i][j])] = (1.0, -1.0)
+                            else:
+                                print("MISSING CASE 2")
                                 # print("Reward 1")
+                        else:
+                            print("MISSING CASE 1")
                     elif privatecard[0][i][j] < privatecard[1][i][j]:
                         win = -1
                         # # print("Player 1 Wins. Bids: ", bids, " depth: ", depth)
@@ -414,8 +418,12 @@ class KuhnGame:
                             if int(bids[0]) == 1:
                                 self.reward[int(histids[i][j])] = (-2.0, 2.0)
                                 # print("Reward -2")
-                            if int(bids[0]) == -1:
+                            elif int(bids[0]) == -1:
                                 self.reward[int(histids[i][j])] = (-1.0, 1.0)
+                            else:
+                                print("MISSING CASE 3")
+                        else:
+                            print("MISSING CASE 4")
                                 # print("Reward -1")
                     # if win == 0:
                     #     self.reward[int(histids[i][j])] = (0, 0)
@@ -571,11 +579,13 @@ class KuhnGame:
                         if depth == 2:
                             nxtbid[player] = 1
                             # print("Player 0 BET")
-                        if depth == 4:
+                        elif depth == 4:
                             nxtbid[player] = nxtbid[1 - player]
                             # nxtquit[player] = True
                             nxtisTerminal = True
                             # print("Player 0 CALL")
+                        else:
+                            print("HERE: depth:", depth)
                     if player == 1:
                         if depth == 3:
                             if nxtbid[1-player] == 1:
@@ -592,10 +602,12 @@ class KuhnGame:
                         if depth == 2:
                             nxtbid[player] = -1
                             # print("Player 0 CHECK")
-                        if depth == 4:
+                        elif depth == 4:
                             nxtbid[player] = -1
                             nxtquit[player] = True
                             # print("Player 0 FOLD")
+                        else:
+                            print("HERE ddep:", depth)
                     if player == 1:
                         if depth == 3:
                             if nxtbid[1-player] == 1:
@@ -607,7 +619,8 @@ class KuhnGame:
                                 nxtisTerminal = True
                                 # nxtquit[player] = True
                                 # print("Player 1 CHECK")
-
+                        else:
+                            print("HERE AA:", depth)
 
                     # print("Player not 2 and i = 0")
                     # if nxtbid[1 - player] == -1:

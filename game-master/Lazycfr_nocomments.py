@@ -268,7 +268,7 @@ class LazyCFR:
 
         self.reachp[owner][isetind] = 0
 
-    def updateAll(self):
+    def updateAll(self, t):
 
         t1 = time.time()
         game = self.game
@@ -311,6 +311,8 @@ class LazyCFR:
                 vals.append(0)#ent_twice * np.log(pol))
             for i, seq in enumerate(self.game.seqs[0][infoset_id]):
                 self.b[0][seq] += ent*(vals[i] - sum_vals)
+                # if t > 20:
+                #     print("Iteration:", t, "seq:", seq, " Value:", ent*(vals[i] - sum_vals))
 
         # TODO vals.append(2.0*np.log(pol)) works well
 
@@ -325,7 +327,7 @@ class LazyCFR:
                 total_entropy1 += pol * np.log(pol)
                 vals.append(0)#ent_twice * np.log(pol))
             for i, seq in enumerate(self.game.seqs[1][infoset_id]):
-                self.b[1][seq] += ent*(vals[i] - sum_vals)
+                self.b[1][seq] += ent*(vals[i] - sum_vals) # Always negative
 
 
         # For plotting entropy of stgy
@@ -442,7 +444,8 @@ class LazyCFR:
                 for i, seq in enumerate(self.game.seqs[player][infoset_id]):
                     sign = -1.0 if player == 0 else 1.0
                     # self.b[player][seq] += sign * KL * (vals[i] - sum_vals)
-                    self.b[player][seq] += sign * KL * vals[i] #sign * KL * (vals[i] - sum_vals)
+                    # self.b[player][seq] += sign * KL * vals[i] #sign * KL * (vals[i] - sum_vals)
+                    self.b[player][seq] += KL * sum_vals
 
         optimistic_gradient = self.opt[player] * self.grad[player] - self.last_opt[player] * self.last_gradient[player]
         self.last_gradient[player] = self.grad[player].copy()

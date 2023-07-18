@@ -28,8 +28,8 @@ class LazyCFR:
 			self.DCFR = True
 
 		self.cfvCache = []
-		self.cfvCache.append(list(map(lambda x: np.zeros(game.nactsOnHist[x], params), range(game.numHists))))
-		self.cfvCache.append(list(map(lambda x: np.zeros(game.nactsOnHist[x], params), range(game.numHists))))
+		self.cfvCache.append(list(map(lambda x: np.zeros(game.nactsOnHist[x]), range(game.numHists))))
+		self.cfvCache.append(list(map(lambda x: np.zeros(game.nactsOnHist[x]), range(game.numHists))))
 
 		self.probNotUpdated = [np.zeros((game.numHists, 2)), np.zeros((game.numHists, 2))]
 		self.probNotPassed = [np.zeros((game.numHists, 2)), np.zeros((game.numHists, 2))]
@@ -149,7 +149,7 @@ class LazyCFR:
 					self.updateIset(owner, nxtisetind)
 		self.reachp[owner][isetind] = 0
 
-	def updateAll(self):
+	def updateAll(self, t):
 		t1 = time.time()
 		game = self.game
 		self.round += 1
