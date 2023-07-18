@@ -224,9 +224,9 @@ def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 		print("Last expl:", expl)
 
 		print("shape", len(expls), len(times), len(nodes))
-		print("HERE: ", gamesolver.stgy[0])
-		print("JACK:", gamesolver.stgy[0][4][0], "OTHER:", gamesolver.stgy[0][20][0], "JACK+0.3333", gamesolver.stgy[0][4][0] + 0.33333333 )
-		print("DIF: ", np.abs(gamesolver.stgy[0][4][0] + 0.333333333333333333 - gamesolver.stgy[0][20][0]))
+		# print("HERE: ", gamesolver.stgy[0])
+		# print("JACK:", gamesolver.stgy[0][4][0], "OTHER:", gamesolver.stgy[0][20][0], "JACK+0.3333", gamesolver.stgy[0][4][0] + 0.33333333 )
+		# print("DIF: ", np.abs(gamesolver.stgy[0][4][0] + 0.333333333333333333 - gamesolver.stgy[0][20][0]))
 
 
 		return (expls, times, nodes, stgy, expl)
