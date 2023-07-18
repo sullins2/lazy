@@ -87,7 +87,7 @@ printround=[10000, 8000, 6000, 4000, 2000, 100, 50, 200, 100, 50, 1, 1]
 
 
 params = {}
-params["thres"] = 0.0004 #0.004#0.01 #0.06
+params["thres"] = 0.0001 #0.004#0.01 #0.06
 # TODO PUT THIS BACK AND SEE HOW FAR IT GOES DOWN
 params["entropy"] = -10.0
 params["mod_value"] = 10000
