@@ -29,13 +29,13 @@ betm=1
 savepath = "leduc_3_"+str(betm)
 
 # algo="cfr"
-algo="lazycfr"
+# algo="lazycfr"
 # algo="komwu"
 # algo="lazyflbr"
-# algo="lazycfr_nocomments"  # This is KOMWU
+algo="lazycfr_nocomments"  # This is KOMWU
 
 Type = "regretmatching"
-Type = "regretmatchingplus"
+# Type = "regretmatchingplus"
 # Type = "dcfr"
 dcfr_params = [1.5, 0.0, 2.0]
 
@@ -47,7 +47,7 @@ dcfr_params = [1.5, 0.0, 2.0]
 # if betm>7:
 # 	game = Game(path=savepath+".npz")
 # else:
-# 	betm = 4
+# 	betm = 3
 # 	game = Game( bidmaximum =betm) #path=savepath+".npz")#bidmaximum=betmpath=
 
 # This is for Kuhn - doesn't have betm..
@@ -101,30 +101,45 @@ printround=[10000, 8000, 6000, 4000, 2000, 100, 50, 200, 100, 50, 1, 1]
 # params["AMMO"] = 500000
 
 
-# THIS BEATS CFR ON KUHN-4
-# params = {}
-# params["thres"] = -10.008 #0.004#0.01 #0.06
-# params["entropy"] = -0.1
-# params["mod_value"] = 1000
-# params["KL"] = -3.0
-# params["KL_mod"] = 1000
-# params["optimism"] = 2.0
-# params["eta"] = 7.0
-# params["entropy_twice"] = False
-# params["final_exploit"] = 1e-12
-# params["AMMO"] = 500000
 
+# THIS BEATS CFR ON KUHN-4
 params = {}
 params["thres"] = -10.008 #0.004#0.01 #0.06
-params["entropy"] = -0.1
+params["entropy"] = -0.2
 params["mod_value"] = 1000
-params["KL"] = -3.0
+params["KL"] = 0.0 #-3.0
 params["KL_mod"] = 1000
+USE THIS AS SHOWING THAT THE POLICY IS NE
 params["optimism"] = 2.0
 params["eta"] = 2.0
 params["entropy_twice"] = False
 params["final_exploit"] = 1e-12
 params["AMMO"] = 500000
+
+# WORKS WELL FOR LEDUC-5
+# params = {}
+# params["thres"] = -0.008
+# params["entropy"] = -5.0
+# params["mod_value"] = 1000
+# params["KL"] = -3.0
+# params["KL_mod"] = 1000
+# params["optimism"] = 2.0
+# params["eta"] = 20.0
+# params["entropy_twice"] = False
+# params["final_exploit"] = 1e-12
+# params["AMMO"] = 500000
+
+# params = {}
+# params["thres"] = 0.008
+# params["entropy"] = -5.0
+# params["mod_value"] = 1000
+# params["KL"] = -3.0
+# params["KL_mod"] = 1000
+# params["optimism"] = 2.0
+# params["eta"] = 20.0
+# params["entropy_twice"] = False
+# params["final_exploit"] = 1e-12
+# params["AMMO"] = 500000
 
 
 # TRY WITH MOD 50: KL = 1, KL = 0.5, entropy_twice=False
