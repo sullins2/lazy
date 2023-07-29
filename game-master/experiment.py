@@ -112,16 +112,18 @@ params["eta"] = 20.0
 params["entropy_twice"] = False
 params["final_exploit"] = 1e-12
 params["AMMO"] = 500000
-params["b_count"] = 20 # Set to negative to disable
-params["b_count_count_at"] = 10
+params["b_count"] = 30 # Set to negative to disable
+params["b_count_count_at"] = 15
 
+# Note: In NFGs, higher is better until it breaks
 # 10 2 4.26
 # 20 10 2.34
 # 20 5 3.15
 # 25 10 2.50
 # 30 15 2.29
 # 20 1 2.95
-# 20 2
+# 20 2 3.36
+# 34 17 2.34
 
 # DOES GOOD ON LEDUC-4
 # params = {}
