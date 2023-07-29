@@ -43,7 +43,7 @@ dcfr_params = [1.5, 0.0, 2.0]
 if betm>7:
 	game = Game(path=savepath+".npz")
 else:
-	betm = 6
+	betm = 5
 	game = Game( bidmaximum =betm) #path=savepath+".npz")#bidmaximum=betmpath=
 
 # This is for Kuhn - doesn't have betm..
@@ -112,15 +112,16 @@ params["eta"] = 20.0
 params["entropy_twice"] = False
 params["final_exploit"] = 1e-12
 params["AMMO"] = 500000
-params["b_count"] = 30 # Set to negative to disable
-params["b_count_count_at"] = 15
+params["b_count"] = 20 # Set to negative to disable
+params["b_count_count_at"] = 10
 
 # 10 2 4.26
 # 20 10 2.34
 # 20 5 3.15
 # 25 10 2.50
 # 30 15 2.29
-# 20 1
+# 20 1 2.95
+# 20 2
 
 # DOES GOOD ON LEDUC-4
 # params = {}
