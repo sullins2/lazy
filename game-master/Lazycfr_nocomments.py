@@ -24,6 +24,9 @@ class LazyCFR:
         self.mod_value = params["mod_value"]
         self.AMMO = params["AMMO"]
         self.KL_mod = params["KL_mod"]
+        self.b_count_check = params["b_count"]
+        self.b_count_count_at = params["b_count_count_at"]
+
 
         self.time = 0
 
@@ -370,7 +373,7 @@ class LazyCFR:
         self.updateKomwu(1, t)
 
         self.b_count += 1
-        if self.b_count == 20:
+        if self.b_count == self.b_count_check:
             self.b = self.b_store.copy()
             # self.b_store = [np.zeros(self.AMMO), np.zeros(self.AMMO)]
             self.b_count = 1
@@ -536,8 +539,7 @@ class LazyCFR:
         self.last_gradient[player] = self.grad[player].copy()
 
         self.b[player] += self.eta * optimistic_gradient
-        if self.b_count >= 10:
-        # if t % 2 == 0:
+        if self.b_count >= self.b_count_count_at:
             self.b_store[player] += self.eta * optimistic_gradient
 
         self.last_opt[player] = self.opt[player] - 1.0

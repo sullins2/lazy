@@ -102,8 +102,8 @@ printround=[10000, 8000, 6000, 4000, 2000, 100, 50, 200, 100, 50, 1, 1]
 # Story: If you can get last iterate convergence, this helps. Otherwise, doesn't help average policy
 # BEER GAME - for early fall
 params = {}
-params["thres"] = -0.01
-params["entropy"] = 0#1
+params["thres"] = -0.008
+params["entropy"] = 0#-1
 params["mod_value"] = 10000
 params["KL"] = 0 #-400.0
 params["KL_mod"] = 10000
@@ -112,6 +112,15 @@ params["eta"] = 20.0
 params["entropy_twice"] = False
 params["final_exploit"] = 1e-12
 params["AMMO"] = 500000
+params["b_count"] = 30 # Set to negative to disable
+params["b_count_count_at"] = 15
+
+# 10 2 4.26
+# 20 10 2.34
+# 20 5 3.15
+# 25 10 2.50
+# 30 15 2.29
+# 20 1
 
 # DOES GOOD ON LEDUC-4
 # params = {}
