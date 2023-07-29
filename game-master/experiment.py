@@ -102,7 +102,7 @@ printround=[10000, 8000, 6000, 4000, 2000, 100, 50, 200, 100, 50, 1, 1]
 # Story: If you can get last iterate convergence, this helps. Otherwise, doesn't help average policy
 # BEER GAME - for early fall
 params = {}
-params["thres"] = -0.008
+params["thres"] = 0.008
 params["entropy"] = 0#-1
 params["mod_value"] = 10000
 params["KL"] = 0 #-400.0
@@ -115,7 +115,12 @@ params["AMMO"] = 500000
 params["b_count"] = 30 # Set to negative to disable
 params["b_count_count_at"] = 15
 
+# Leduc-5
+# 30 15 24,904,660
+
+# Try starting b_count at negative, or some way of letting it get going faster initially?
 # Note: In NFGs, higher is better until it breaks
+# Leduc-4
 # 10 2 4.26
 # 20 10 2.34
 # 20 5 3.15
