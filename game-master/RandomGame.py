@@ -30,10 +30,12 @@ class Game:
         self.seqs = [{}, {}]
         self.childrenInfosets = [{}, {}]  # seq -> [infosetid, ...]
         self.parSeq = [{}, {}]
-        np.random.seed(12)
+        np.random.seed(121)  #12 was strange one
         self.reward1 = np.random.randint(-10, 11)
         self.reward2 = np.random.randint(-10, 11)
         self.reward3 = np.random.randint(-10, 11)
+
+        self.rewards = [[], []]
 
         if path == -1:
             self.genGame(np.array([[-1]]), np.array([[-1]]), [np.array([-1]), np.array([-1])],
@@ -163,6 +165,7 @@ class Game:
             self.nactsOnIset[0].append(0)
             self.Iset2Hists[0].append(0)
             isetids[0][i] = int(self.numIsets[0])
+            self.rewards[0].append(np.random.uniform(0, 4))
             # print("isetid: ", isetids[0][i])
             self.isetPar[0][self.numIsets[0]] = (int(parisets[0][i]), int(iacts[0][i]))
             # print("isetPar: ", self.isetPar[0][self.numIsets[0]])
@@ -212,6 +215,8 @@ class Game:
             self.nactsOnIset[1].append(0)
             self.Iset2Hists[1].append(0)
             isetids[1][i] = int(self.numIsets[1])
+
+            self.rewards[0].append(np.random.uniform(0, 4))
             # # print("isetids: ", isetids[1][i])
             self.isetPar[1][self.numIsets[1]] = (int(parisets[1][i]), int(iacts[1][i]))
             # # print("isetPar: ", self.isetPar[1][self.numIsets[1]])
@@ -343,15 +348,32 @@ class Game:
                         win = 1
                     elif privatecard[0][i][j] < privatecard[1][i][j]:
                         win = -1
+
+                    # KOMWU WORKS, entropy faster (ETA=10 works like this, ETA=1 is strange)
+                    # if win == 0:
+                    #     self.reward[int(histids[i][j])] = (0, 0)
+                    # elif win == 1:
+                    #     self.reward[int(histids[i][j])] = (bids[1] + 0.4, -bids[1] - 0.4)
+                    # elif win == -1:
+                    #     self.reward[int(histids[i][j])] = (-bids[0] - 0.8, bids[0] + 0.8)
+                    # KOMWU WORKS, entropy makes it faster
+                    # if win == 0:
+                    #     self.reward[int(histids[i][j])] = (0, 0)
+                    # elif win == 1:
+                    #     self.reward[int(histids[i][j])] = (bids[1] + 0.2, -bids[1] - 0.2)
+                    # elif win == -1:
+                    #     self.reward[int(histids[i][j])] = (-bids[0] - 0.4, bids[0] + 0.4)
+                    # KOMWU FAILS, others (CFR, FLBR) fine
                     if win == 0:
-                        rn = np.random.randint(-10, 11)
                         self.reward[int(histids[i][j])] = (0, 0)
                     elif win == 1:
-                        rn = np.random.rand() * 20 - 10
-                        self.reward[int(histids[i][j])] = (bids[1] + self.reward2, -bids[1] - self.reward2)
+                        # f = np.random.uniform(0, 4)
+                        # self.reward[int(histids[i][j])] = (f, -f)
+                        self.reward[int(histids[i][j])] = (bids[1] + 0.5, -bids[1] - 0.5)
                     elif win == -1:
-                        rn = np.random.rand() * 20 - 10
-                        self.reward[int(histids[i][j])] = (-bids[0] - self.reward3, bids[0] + self.reward3)
+                        # f = np.random.uniform(0, 4)
+                        # self.reward[int(histids[i][j])] = (-f, f)
+                        self.reward[int(histids[i][j])] = (-bids[0] - 1.0, bids[0] + 1.0)
                 # # print("Just set a terminal")
             return  # histids, isetids
 

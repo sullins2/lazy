@@ -1,6 +1,6 @@
 import numpy as np
-from LeducHoldem_with_KOMWU import Game
-# from RandomGame import Game
+# from LeducHoldem_with_KOMWU import Game
+from RandomGame import Game
 from Kuhn_with_KOMWU import KuhnGame
 import copy
 import queue
@@ -39,22 +39,18 @@ Type = "regretmatching"
 # Type = "dcfr"
 dcfr_params = [1.5, 0.0, 2.0]
 
-
-
-# TODO put all hyperparameters in a file to read in
-
 # This is for all Leduc
-# if betm>7:
-# 	game = Game(path=savepath+".npz")
-# else:
-# 	betm = 3
-# 	game = Game( bidmaximum =betm) #path=savepath+".npz")#bidmaximum=betmpath=
+if betm>7:
+	game = Game(path=savepath+".npz")
+else:
+	betm = 6
+	game = Game( bidmaximum =betm) #path=savepath+".npz")#bidmaximum=betmpath=
 
 # This is for Kuhn - doesn't have betm..
-if betm>7:
-	game = KuhnGame(path=savepath+".npz")
-else:
-	game = KuhnGame( bidmaximum =betm)
+# if betm>7:
+# 	game = KuhnGame(path=savepath+".npz")
+# else:
+# 	game = KuhnGame( bidmaximum =betm)
 
 # print("-----------------------------")
 # print(game.infoSets[0])
@@ -87,12 +83,42 @@ printround=[10000, 8000, 6000, 4000, 2000, 100, 50, 200, 100, 50, 1, 1]
 
 
 
+
+# LEDUC-3 works well
+# params = {}
+# params["thres"] = -0.008 #0.004#0.01 #0.06
+# params["entropy"] = -6.0
+# params["mod_value"] = 1000
+# params["KL"] = -3.0
+# params["KL_mod"] = 1000
+# params["optimism"] = 2.0
+# params["eta"] = 1.0
+# params["entropy_twice"] = False
+# params["final_exploit"] = 1e-12
+# params["AMMO"] = 500000
+
+
+# figure out why rewards change results
+# Story: If you can get last iterate convergence, this helps. Otherwise, doesn't help average policy
+# BEER GAME - for early fall
+params = {}
+params["thres"] = -0.01
+params["entropy"] = 0#1
+params["mod_value"] = 10000
+params["KL"] = 0 #-400.0
+params["KL_mod"] = 10000
+params["optimism"] = 2.0
+params["eta"] = 20.0
+params["entropy_twice"] = False
+params["final_exploit"] = 1e-12
+params["AMMO"] = 500000
+
 # DOES GOOD ON LEDUC-4
 # params = {}
-# params["thres"] = 0.05 #0.004#0.01 #0.06
+# params["thres"] = -0.01
 # params["entropy"] = -3.1
 # params["mod_value"] = 1000
-# params["KL"] = 0 #1.0 #422
+# params["KL"] = -3.0 #-1.0
 # params["KL_mod"] = 1000
 # params["optimism"] = 2.0
 # params["eta"] = 20.0
@@ -101,24 +127,22 @@ printround=[10000, 8000, 6000, 4000, 2000, 100, 50, 200, 100, 50, 1, 1]
 # params["AMMO"] = 500000
 
 
-
-# THIS BEATS CFR ON KUHN-4
-params = {}
-params["thres"] = -10.008 #0.004#0.01 #0.06
-params["entropy"] = -0.2
-params["mod_value"] = 1000
-params["KL"] = 0.0 #-3.0
-params["KL_mod"] = 1000
-USE THIS AS SHOWING THAT THE POLICY IS NE
-params["optimism"] = 2.0
-params["eta"] = 2.0
-params["entropy_twice"] = False
-params["final_exploit"] = 1e-12
-params["AMMO"] = 500000
+#  FORGET KUHN
+# params = {}
+# params["thres"] = -10.008 #0.004#0.01 #0.06
+# params["entropy"] = 0#-0.2
+# params["mod_value"] = 100
+# params["KL"] = 0#-3.0
+# params["KL_mod"] = 1000
+# params["optimism"] = 2.0
+# params["eta"] = 5.0
+# params["entropy_twice"] = False
+# params["final_exploit"] = 1e-12
+# params["AMMO"] = 500000
 
 # WORKS WELL FOR LEDUC-5
 # params = {}
-# params["thres"] = -0.008
+# params["thres"] = 0.008
 # params["entropy"] = -5.0
 # params["mod_value"] = 1000
 # params["KL"] = -3.0
@@ -128,6 +152,7 @@ params["AMMO"] = 500000
 # params["entropy_twice"] = False
 # params["final_exploit"] = 1e-12
 # params["AMMO"] = 500000
+
 
 # params = {}
 # params["thres"] = 0.008
@@ -142,7 +167,7 @@ params["AMMO"] = 500000
 # params["AMMO"] = 500000
 
 
-# TRY WITH MOD 50: KL = 1, KL = 0.5, entropy_twice=False
+
 print("params: ", params)
 
 
@@ -171,7 +196,7 @@ def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 		plot_its = []
 		stgy = None
 		quit = False
-		Z = 5000
+		Z = 2000
 		while z <= Z: #: 0000000: #cumutime + time.time() - timestamp < timelim or gamesolver.nodestouched < minimum:
 			z += 1
 			plot_its.append(z)
@@ -198,7 +223,8 @@ def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 				# 	z = np.inf
 				# 	if solver.round > 6000:
 				# 		break
-			stgy = gamesolver.updateAll(t=z)
+			curexpl = gamesolver.getExploitability()
+			stgy = gamesolver.updateAll(curexpl, t=z)
 			if z % 15 == 0: #time.time() - timestamp > reporttimes[betm]:
 				cumutime += time.time() - timestamp
 				expl = gamesolver.getExploitability()
@@ -236,7 +262,14 @@ def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 		plt.plot(expl_iters, expl_plot, 'b-', label='None')
 		plt.xlabel('Nodes Touched')
 		plt.ylabel('Exploitability')
-		plt.ylim(0.0, 1.0)  # Set y-axis range
+		# Set the axis scale to logarithmic
+		plt.xscale('log')
+		plt.yscale('log')
+		# Set the axis limits
+		plt.xlim(1, 1e7)  # x-axis limits from 1 to 100000 (10^5)
+		plt.ylim(1e-8, 1)  # y-axis limits from 10^-12 to 1
+
+		# plt.ylim(0.0, 1.0)  # Set y-axis range
 		plt.legend()
 		plt.show()
 
@@ -271,6 +304,7 @@ def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 		print("shape", len(expls), len(times), len(nodes))
 		# print("HERE: ", gamesolver.stgy[0])
 		# print("THIS: ", gamesolver.stgy[0][17])
+		print(gamesolver.stgy[0][21:61])
 		print("JACK:", gamesolver.stgy[0][4][0], "OTHER:", gamesolver.stgy[0][20][0], "JACK+0.3333", gamesolver.stgy[0][4][0] + 0.33333333 )
 		print("DIF: ", np.abs(gamesolver.stgy[0][4][0] + 0.333333333333333333 - gamesolver.stgy[0][20][0]))
 

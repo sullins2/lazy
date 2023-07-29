@@ -149,7 +149,7 @@ class LazyCFR:
 					self.updateIset(owner, nxtisetind)
 		self.reachp[owner][isetind] = 0
 
-	def updateAll(self, t):
+	def updateAll(self, curexpl, t):
 		t1 = time.time()
 		game = self.game
 		self.round += 1

@@ -11,6 +11,7 @@ class RegretSolver:
 		self.sumWeight = 0.0
 		self.dim = dim
 		self.curstgy = np.ones(dim) / self.dim
+		self.regret = np.zeros(dim)
 
 	# REGRET MATCHING
 	# dim IS INITIALIZED TO THE NUMBER OF ACTIONS IN THIS INFOSET
@@ -53,10 +54,19 @@ class RegretSolver:
 
 	def cfrreg(self):
 		ret = np.zeros(self.dim)
+		whi = np.zeros(self.dim)
 		for d in range(self.dim):
 			#if self.sumRewVector[d] > self.gained:  # THIS IS BECAUSE POLICY IS BASED ON POSITIVE REGRET SUMS
 			ret[d] = self.sumRewVector[d] - self.gained
-		return ret
+			if ret[d] < 0:
+				# self.sumRewVector[d] = 0
+				whi[d] = 1.0
+		# s = sum(ret)
+		# if s < 1e-8:
+		# 	self.sumRewVector = np.zeros(self.dim)
+		# 	return False
+		return whi
+		# return True
 		# s = sum(ret)
 		# if s < 1e-8:
 		# 	return np.ones(self.dim) / self.dim
@@ -222,7 +232,7 @@ def generateOutcome(game, stgy_prof):
 		# all this does is returns the reward
 		if game.isTerminal[hist]:
 			rew[hist] = game.reward[hist][0]
-			# print(game.reward[hist][0])
+			# print(game.reward[hist])
 			outcome[hist] = []
 			# print("Terminal: ", hist, " reward: ", game.reward[hist][0])
 			return rew[hist]

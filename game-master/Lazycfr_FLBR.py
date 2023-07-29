@@ -68,6 +68,7 @@ class LazyCFR:
 
         self.stgy = [[], []]
         self.stgy_xi = [[], []]
+        self.stgy_br = [[], []]
 
         self.total_seqs = [-1, -1]
         self.new_seqs = [[], []]
@@ -105,19 +106,24 @@ class LazyCFR:
                 # self.total_seqs[1] += 1
 
 
+
         for i, iset in enumerate(range(game.numIsets[0])):
             nact = game.nactsOnIset[0][iset]
             if game.playerOfIset[0][iset] == 0:
                 self.stgy_xi[0].append(np.ones(nact) / nact)
+                self.stgy_br[0].append(np.ones(nact) / nact)
             else:
                 self.stgy_xi[0].append(np.ones(0))
+                self.stgy_br[0].append(np.ones(0))
 
         for i, iset in enumerate(range(game.numIsets[1])):
             nact = game.nactsOnIset[1][iset]
             if game.playerOfIset[1][iset] == 1:
                 self.stgy_xi[1].append(np.ones(nact) / nact)
+                self.stgy_br[1].append(np.ones(nact) / nact)
             else:
                 self.stgy_xi[1].append(np.ones(0))
+                self.stgy_br[1].append(np.ones(0))
 
         # hist_seqs0 = []
         # for h in range(game.numHists):
@@ -351,9 +357,9 @@ class LazyCFR:
                     else:
                         # On second step, if still only check based on what first step did
                         # self.probNotUpdatedFirstCopy[owner][nxth][1 - owner]
-                        sumprob += self.probNotUpdatedFirstCopy[owner][nxth][1 - owner]
+                        # sumprob += self.probNotUpdatedFirstCopy[owner][nxth][1 - owner]
                         # Use current probNotUpdated
-                        # sumprob += self.probNotUpdated[owner][nxth][1 - owner]
+                        sumprob += self.probNotUpdated[owner][nxth][1 - owner]
 
                 if game.playerOfIset[owner][isetind] == owner:
                     # The strategy used for each step
@@ -395,7 +401,7 @@ class LazyCFR:
         else:
             self.reachp[owner][isetind] = 0
 
-    def updateAll(self):
+    def updateAll(self, curexpl, t):
         t1 = time.time()
         game = self.game
         self.round += 1
@@ -421,8 +427,12 @@ class LazyCFR:
         # print("LEN: ", len(self.visited[0]))
 
         # Update to get stgy_xi
-        self.updateKomwu(0, first_step=True)
-        self.updateKomwu(1, first_step=True)
+        self.updateKomwu(0, first_step=True, t=t)
+        self.updateKomwu(1, first_step=True, t=t)
+
+        if t % 10 == 0:
+            self.stgy_br[0] = copy.deepcopy(self.stgy_xi[0])
+            self.stgy_br[1] = copy.deepcopy(self.stgy_xi[1])
 
         # Reset for second update rule
         self.reachp[0][0] += 1  # These are set to zero in line just above so only ever have values 0 or 1
@@ -475,8 +485,8 @@ class LazyCFR:
         # ###########################################
 
         # Update to get stgy
-        self.updateKomwu(0, first_step=False)
-        self.updateKomwu(1, first_step=False)
+        self.updateKomwu(0, first_step=False, t=t)
+        self.updateKomwu(1, first_step=False, t=t)
 
         self.probNotUpdatedFirstCopy = [np.zeros((game.numHists, 2)), np.zeros((game.numHists, 2))]
 
@@ -498,12 +508,14 @@ class LazyCFR:
         # self.getAvgStgy(0, 0)
         # self.reachp[1][0] = 1
         # self.getAvgStgy(1, 0)
-        stgy_prof.append(list(map(lambda _x: avg(_x), self.sumstgy[0])))
-        stgy_prof.append(list(map(lambda _x: avg(_x), self.sumstgy[1])))
+        stgy_prof.append(list(map(lambda _x: avg(_x), self.stgy[0])))
+        stgy_prof.append(list(map(lambda _x: avg(_x), self.stgy[1])))
+        # stgy_prof.append(list(map(lambda _x: avg(_x), self.sumstgy[0])))
+        # stgy_prof.append(list(map(lambda _x: avg(_x), self.sumstgy[1])))
         self.mike = stgy_prof
         return exploitability(self.game, stgy_prof)
 
-    def updateKomwu(self, player, first_step):
+    def updateKomwu(self, player, first_step,t):
 
 
         # The first step is applying a large learning rate to the utilities updating the logits
@@ -511,41 +523,64 @@ class LazyCFR:
         # self.K_j_first_step = [[None] * self.AMMO, [None] * self.AMMO]
 
         if first_step:
-            xi = 100.0 #100.0
+            xi = 100.0
+            # if t % 2 == 0 and player == 0:
+            #     xi = 100.0
+            # elif t % 2 == 0 and player == 1:
+            #     xi = -100.0
+            # if t % 2 != 0 and player == 1:
+            #     xi = 100.0
+            # elif t % 2 != 0 and player == 0:
+            #     xi = -100.0
+            # print(t % 2, player)
             self.b_xi[player] = self.b[player].copy() # Copy the current b
-            self.b_xi[player] += xi * self.grad[player] # Add the current utility times xi
 
             ####### ENTROPY ##################
-            mod = self.round // 100
-            ent = 0 #-0.1 / (mod + 1)
-            for infoset_id in self.visited[player][::-1]:
-                vals = []
-                sum_vals = 0.0
-                # reg = self.solvers[0][infoset_id].cfrreg()
-                for i, seq in enumerate(self.game.seqs[player][infoset_id]):
-                    pol = self.stgy[player][infoset_id][i]
-                    if pol == 0:
-                        pol = 0.00000000000000000000000000000001
-                    sum_vals += pol * np.log(pol)
-                    vals.append(np.log(pol))
-                for i, seq in enumerate(self.game.seqs[player][infoset_id]):
-                    self.b_xi[player][seq] += ent * (vals[i] - sum_vals)
+            # mod = self.round // 100
+            # ent = 0 #-3.0 / np.log(self.round + 2.0) #(mod + 1)
+            # for infoset_id in self.visited[player][::-1]:
+            #     vals = []
+            #     sum_vals = 0.0
+            #     # reg = self.solvers[0][infoset_id].cfrreg()
+            #     for i, seq in enumerate(self.game.seqs[player][infoset_id]):
+            #         pol = self.stgy[player][infoset_id][i]
+            #         if pol == 0:
+            #             pol = 0.00000000000000000000000000000001
+            #         sum_vals += -pol * np.log(pol)
+            #         vals.append(-pol * np.log(pol))
+            #     for i, seq in enumerate(self.game.seqs[player][infoset_id]):
+            #         self.b_xi[player][seq] += ent * sum_vals #(vals[i] - sum_vals)
 
-            KL = 0.0
+
+            self.b_xi[player] += xi * self.grad[player] # Add the current utility times xi
+
+
+
+            mod = self.round // 100
+            KL = 1.0 / (mod + 1.0)
             if self.last_stgy[player] != None:
                 vals = []
                 for infoset_id in self.visited[player][::-1]:
                     sum_vals = 0.0
                     for i, seq in enumerate(self.game.seqs[player][infoset_id]):
-                        old_pol = self.stgy[player][infoset_id][i]
-                        pol = self.last_stgy[player][infoset_id][i]
-                        pol = np.clip(pol, a_min=np.finfo(float).eps, a_max=None)
-                        old_pol = np.clip(old_pol, a_min=np.finfo(float).eps, a_max=None)
-                        # p = np.clip(pol / old_pol, a_min=np.finfo(float).eps, a_max=None)
-                        sum_vals += pol * np.log(pol / old_pol)
-                        vals.append(pol * np.log(pol / old_pol))
-                    for i, seq in enumerate(self.game.seqs[player][infoset_id]):
-                        self.b_xi[player][seq] += KL * (vals[i] - sum_vals)
+                        strat = self.stgy[player][infoset_id][i]
+                        ref_strat = self.stgy_br[player][infoset_id][i]
+                        new_rew = min((KL / strat) * (ref_strat - strat), 10)
+                        new_rew = max(new_rew, 1e-10)
+                        # new_rew = 0.0
+                        self.b_xi[player][seq] += new_rew
+
+
+
+                    #     old_pol = self.stgy[player][infoset_id][i]
+                    #     pol = self.last_stgy[player][infoset_id][i]
+                    #     pol = np.clip(pol, a_min=np.finfo(float).eps, a_max=None)
+                    #     old_pol = np.clip(old_pol, a_min=np.finfo(float).eps, a_max=None)
+                    #     # p = np.clip(pol / old_pol, a_min=np.finfo(float).eps, a_max=None)
+                    #     sum_vals += pol * np.log(pol / old_pol)
+                    #     vals.append(pol * np.log(pol / old_pol))
+                    # for i, seq in enumerate(self.game.seqs[player][infoset_id]):
+                    #     self.b_xi[player][seq] += KL * (vals[i] - sum_vals)
 
 
             self.last_stgy[player] = copy.deepcopy(self.stgy[player])
@@ -592,12 +627,12 @@ class LazyCFR:
                 for ii, sequence_id in enumerate(self.new_seqs[player][infoset_id]):
                     self.stgy_xi[player][infoset_id][ii] = self.exp_y_xi[player][sequence_id] / denom
 
-            self.nodestouched += len(self.visited[player][::-1]) * 2
+            self.nodestouched += len(self.visited[player][::-1]) * 1
 
         else:
             # Second update rule of FLBR
             # KOMWU uses K_j's and b's here
-            eta = 1.0 #0.05   #1 flbr not working 44 mil
+            eta = 1.0 # / 9.0  #1 flbr not working 44 mil
             # eta = np.sqrt(np.log(2) / (self.round +  1.0))
             self.b[player] += eta * self.grad[player]
 
@@ -662,7 +697,7 @@ class LazyCFR:
                 for ii, sequence_id in enumerate(self.new_seqs[player][infoset_id]):
                     self.stgy[player][infoset_id][ii] = self.exp_y[player][sequence_id] / denom
 
-            self.nodestouched += len(self.visited[player][::-1]) * 2
+            self.nodestouched += len(self.visited[player][::-1]) * 1
 
 
 
