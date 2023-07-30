@@ -43,7 +43,7 @@ dcfr_params = [1.5, 0.0, 2.0]
 if betm>7:
 	game = Game(path=savepath+".npz")
 else:
-	betm = 5
+	betm = 6
 	game = Game( bidmaximum =betm) #path=savepath+".npz")#bidmaximum=betmpath=
 
 # This is for Kuhn - doesn't have betm..
@@ -102,7 +102,7 @@ printround=[10000, 8000, 6000, 4000, 2000, 100, 50, 200, 100, 50, 1, 1]
 # Story: If you can get last iterate convergence, this helps. Otherwise, doesn't help average policy
 # BEER GAME - for early fall
 params = {}
-params["thres"] = 0.005
+params["thres"] = 0.006
 params["entropy"] = 0#-1
 params["mod_value"] = 10000
 params["KL"] = 0 #-400.0
@@ -112,13 +112,16 @@ params["eta"] = 20.0
 params["entropy_twice"] = False
 params["final_exploit"] = 1e-12
 params["AMMO"] = 500000
-params["b_count"] = 36 # Set to negative to disable
-params["b_count_count_at"] = 14
+params["b_count"] = 20 # Set to negative to disable
+params["b_count_count_at"] = 9
 
 # TODO TRY 10 5
 # Leduc-5 (regular KOMWU = 43m)
 # 30 15 24,904,660
 # 20 10 29,299,600
+# 20  6 thres=0.008 6,318,790
+# 20  8 thres=0.008 4,295,362
+# 20  9 thres=0.008 4,093,510
 # 20 10 thres=0.008 4,663,504
 # 30 15 thres=0.008 7,033,066
 # 36 18 thres=0.008 6,009,842
@@ -127,6 +130,9 @@ params["b_count_count_at"] = 14
 # 36 15 thres=0.008 5,450,058
 # 36 20 thres=0.008 5,900,158
 # 36 10 thres=0.008 7,145,102
+
+# Leduc-6
+# 36 15 thres=0.007 25,804,088
 
 # Try starting b_count at negative, or some way of letting it get going faster initially?
 # Note: In NFGs, higher is better until it breaks
