@@ -557,7 +557,7 @@ class LazyCFR:
 
 
             mod = self.round // 100
-            KL = 1.0 / (mod + 1.0)
+            KL = 0.0 / (mod + 1.0)
             if self.last_stgy[player] != None:
                 vals = []
                 for infoset_id in self.visited[player][::-1]:

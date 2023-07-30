@@ -31,8 +31,8 @@ savepath = "leduc_3_"+str(betm)
 # algo="cfr"
 # algo="lazycfr"
 # algo="komwu"
-# algo="lazyflbr"
-algo="lazycfr_nocomments"  # This is KOMWU
+algo="lazyflbr"
+# algo="lazycfr_nocomments"  # This is KOMWU
 
 Type = "regretmatching"
 # Type = "regretmatchingplus"
@@ -43,7 +43,7 @@ dcfr_params = [1.5, 0.0, 2.0]
 if betm>7:
 	game = Game(path=savepath+".npz")
 else:
-	betm = 6
+	betm = 3
 	game = Game( bidmaximum =betm) #path=savepath+".npz")#bidmaximum=betmpath=
 
 # This is for Kuhn - doesn't have betm..
@@ -108,7 +108,7 @@ params["mod_value"] = 10000
 params["KL"] = 0 #-400.0
 params["KL_mod"] = 10000
 params["optimism"] = 2.0
-params["eta"] = 20.0
+params["eta"] = 1.0
 params["entropy_twice"] = False
 params["final_exploit"] = 1e-12
 params["AMMO"] = 500000
