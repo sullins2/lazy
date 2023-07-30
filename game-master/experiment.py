@@ -116,7 +116,7 @@ params["b_count"] = 38 # Set to negative to disable
 params["b_count_count_at"] = 19
 
 # Leduc-5 (regular KOMWU = 43m)
-# 30 15 24,904,660
+# 30 15 24,904,660 
 # 20 10 29,299,600
 # 30 15 thres=0.008 7,033,066
 # 36 18 thres=0.008 6,009,842
