@@ -367,13 +367,13 @@ class Game:
                     if win == 0:
                         self.reward[int(histids[i][j])] = (0, 0)
                     elif win == 1:
-                        f = np.random.uniform(0, 7)
-                        self.reward[int(histids[i][j])] = (f, -f)
-                        # self.reward[int(histids[i][j])] = (bids[1] + 0.5, -bids[1] - 0.5)
+                        # f = np.random.uniform(0, 7)
+                        # self.reward[int(histids[i][j])] = (f, -f)
+                        self.reward[int(histids[i][j])] = (bids[1] + 0.5, -bids[1] - 0.5)
                     elif win == -1:
-                        f = np.random.uniform(0, 7)
-                        self.reward[int(histids[i][j])] = (-f, f)
-                        # self.reward[int(histids[i][j])] = (-bids[0] - 1.0, bids[0] + 1.0)
+                        # f = np.random.uniform(0, 7)
+                        # self.reward[int(histids[i][j])] = (-f, f)
+                        self.reward[int(histids[i][j])] = (-bids[0] - 1.0, bids[0] + 1.0)
                 # # print("Just set a terminal")
             return  # histids, isetids
 
