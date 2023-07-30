@@ -102,7 +102,7 @@ printround=[10000, 8000, 6000, 4000, 2000, 100, 50, 200, 100, 50, 1, 1]
 # Story: If you can get last iterate convergence, this helps. Otherwise, doesn't help average policy
 # BEER GAME - for early fall
 params = {}
-params["thres"] = 0.005
+params["thres"] = 0.006
 params["entropy"] = 0#-1
 params["mod_value"] = 10000
 params["KL"] = 0 #-400.0
