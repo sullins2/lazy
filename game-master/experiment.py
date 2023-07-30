@@ -113,7 +113,7 @@ params["entropy_twice"] = False
 params["final_exploit"] = 1e-12
 params["AMMO"] = 500000
 params["b_count"] = 36 # Set to negative to disable
-params["b_count_count_at"] = 15
+params["b_count_count_at"] = 10
 
 # Leduc-5 (regular KOMWU = 43m)
 # 30 15 24,904,660
@@ -122,6 +122,7 @@ params["b_count_count_at"] = 15
 # 36 18 thres=0.008 6,009,842
 # 38 19 thres=0.008 6,520,540
 # 44 22 thres=0.008 8,168,750
+# 36 15 thres=0.008 5,450,058
 
 # Try starting b_count at negative, or some way of letting it get going faster initially?
 # Note: In NFGs, higher is better until it breaks
