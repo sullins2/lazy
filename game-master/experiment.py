@@ -112,14 +112,15 @@ params["eta"] = 20.0
 params["entropy_twice"] = False
 params["final_exploit"] = 1e-12
 params["AMMO"] = 500000
-params["b_count"] = 38 # Set to negative to disable
-params["b_count_count_at"] = 19
+params["b_count"] = 36 # Set to negative to disable
+params["b_count_count_at"] = 15
 
 # Leduc-5 (regular KOMWU = 43m)
-# 30 15 24,904,660 
+# 30 15 24,904,660
 # 20 10 29,299,600
 # 30 15 thres=0.008 7,033,066
 # 36 18 thres=0.008 6,009,842
+# 38 19 thres=0.008 6,520,540
 # 44 22 thres=0.008 8,168,750
 
 # Try starting b_count at negative, or some way of letting it get going faster initially?
