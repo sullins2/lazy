@@ -112,8 +112,8 @@ params["eta"] = 20.0
 params["entropy_twice"] = False
 params["final_exploit"] = 1e-12
 params["AMMO"] = 500000
-params["b_count"] = 20 # Set to negative to disable
-params["b_count_count_at"] = 8 
+params["b_count"] = 21 # Set to negative to disable
+params["b_count_count_at"] = 9 
 
 # TODO TRY 10 5
 # Leduc-5 (regular KOMWU = 43m)
