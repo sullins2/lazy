@@ -363,35 +363,35 @@ def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 
 # game = KuhnGame( bidmaximum =betm)
 betm = 5
+# TODO LEDUC 4 IS RUNNING
 game = Game( bidmaximum =betm)
-params["thres"] = -0.005
-params["eta"] = 20.0 #1.0
+params["thres"] = 0.008
+params["eta"] = 3.0 #1.0
 params["final_exploit"] = 1e-12
-params["b_count"] = [-20] # Set to negative to disable
-params["b_count_count_at"] = [10]
+params["b_count"] = [20] # Set to negative to disable
+params["b_count_count_at"] = [9]
 res = run(game, Type=Type, solvername=algo)
 its0 = res[5]
 plots0 = res[6]
 
-# TODO run the large kuhn longer
 game = Game( bidmaximum =betm) #path=savepath+".npz")#bidmaximum=betmpath=
 # game = KuhnGame( bidmaximum =betm)
-params["thres"] = -0.005
-params["eta"] = 20.0 #1.0
+params["thres"] = 0.008
+params["eta"] = 10.0 #1.0
 params["final_exploit"] = 1e-12
 params["b_count"] = [20] # Set to negative to disable
-params["b_count_count_at"] = [10]
+params["b_count_count_at"] = [9]
 res = run(game, Type=Type, solvername=algo)
 its1 = res[5]
 plots1 = res[6]
 #
 # game = KuhnGame( bidmaximum =betm)
 game = Game( bidmaximum =betm) #path=savepath+".npz")#bidmaximum=betmpath=
-params["thres"] = 0.005
-params["eta"] = 20.0 #1.0
+params["thres"] = 0.008
+params["eta"] = 5.0 #1.0
 params["final_exploit"] = 1e-12
 params["b_count"] = [20] #36 # Set to negative to disable
-params["b_count_count_at"] = [10] #15
+params["b_count_count_at"] = [9] #15
 res = run(game, Type=Type, solvername=algo)
 its2 = res[5]
 plots2 = res[6]
