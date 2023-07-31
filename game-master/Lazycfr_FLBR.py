@@ -9,10 +9,14 @@ from scipy.special import logsumexp
 
 
 class LazyCFR:
-    def __init__(self, game, Type="regretmatching", thres=0.0):
+    def __init__(self, game, Type="regretmatching", thres=0.0, params=None):
         print("initializing solver")
         self.thres = thres
         self.time = 0
+        self.eta = params["eta"]
+        self.b_count_check = params["b_count"]
+        self.b_count_count_at = params["b_count_count_at"]
+        self.b_count = 1
 
         self.game = game
 
@@ -50,6 +54,7 @@ class LazyCFR:
 
         self.AMMO = 12000
         self.b = [np.zeros(self.AMMO), np.zeros(self.AMMO)]
+        self.b_store = [np.zeros(self.AMMO), np.zeros(self.AMMO)]
 
         self.seqCount = [np.zeros(self.AMMO), np.zeros(self.AMMO)]
         self.seqCountFlag = [np.zeros(self.AMMO), np.zeros(self.AMMO)]
@@ -449,38 +454,34 @@ class LazyCFR:
         self.updateIset(1, 0, [[], [], [], []], first_step=False)
 
         # ####### ENTROPY ##################
-        mod = self.round // 50
-        ent = 0 #-0.005 / (mod + 1)
-        for infoset_id in self.visited[0][::-1]:
-            vals = []
-            sum_vals = 0.0
-            # reg = self.solvers[0][infoset_id].cfrreg()
-            for i, seq in enumerate(self.game.seqs[0][infoset_id]):
-                pol = self.stgy[0][infoset_id][i]
-                if pol == 0:
-                    pol = 0.00000000000000000000000000000001
-                sum_vals += pol * np.log(pol)
-                vals.append(np.log(pol))
-            for i, seq in enumerate(self.game.seqs[0][infoset_id]):
-                self.b[0][seq] += ent * (vals[i] - sum_vals)
-                # if reg[i] > 0.0:
-                #     self.b[0][seq] *= 1.1
-                # if reg[i] < 0.0:
-                #     self.b[0][seq] *= 0.950
+        # mod = self.round // 50
+        # ent = 0 #-0.005 / (mod + 1)
+        # for infoset_id in self.visited[0][::-1]:
+        #     vals = []
+        #     sum_vals = 0.0
+        #     # reg = self.solvers[0][infoset_id].cfrreg()
+        #     for i, seq in enumerate(self.game.seqs[0][infoset_id]):
+        #         pol = self.stgy[0][infoset_id][i]
+        #         if pol == 0:
+        #             pol = 0.00000000000000000000000000000001
+        #         sum_vals += pol * np.log(pol)
+        #         vals.append(np.log(pol))
+        #     for i, seq in enumerate(self.game.seqs[0][infoset_id]):
+        #         self.b[0][seq] += ent * (vals[i] - sum_vals)
 
         # CHECK MAGNITUDE AND SIGNS
-        for infoset_id in self.visited[1][::-1]:
-            vals = []
-            sum_vals = 0.0
-            # reg = self.solvers[1][infoset_id].cfrreg()
-            for i, seq in enumerate(self.game.seqs[1][infoset_id]):
-                pol = self.stgy[1][infoset_id][i]
-                if pol == 0:
-                    pol = 0.00000000000000000000000000000001
-                sum_vals += pol * np.log(pol)
-                vals.append(np.log(pol))
-            for i, seq in enumerate(self.game.seqs[1][infoset_id]):
-                self.b[1][seq] += ent * (vals[i] - sum_vals)
+        # for infoset_id in self.visited[1][::-1]:
+        #     vals = []
+        #     sum_vals = 0.0
+        #     # reg = self.solvers[1][infoset_id].cfrreg()
+        #     for i, seq in enumerate(self.game.seqs[1][infoset_id]):
+        #         pol = self.stgy[1][infoset_id][i]
+        #         if pol == 0:
+        #             pol = 0.00000000000000000000000000000001
+        #         sum_vals += pol * np.log(pol)
+        #         vals.append(np.log(pol))
+        #     for i, seq in enumerate(self.game.seqs[1][infoset_id]):
+        #         self.b[1][seq] += ent * (vals[i] - sum_vals)
         #
         # ###########################################
 
@@ -489,6 +490,12 @@ class LazyCFR:
         self.updateKomwu(1, first_step=False, t=t)
 
         self.probNotUpdatedFirstCopy = [np.zeros((game.numHists, 2)), np.zeros((game.numHists, 2))]
+
+        self.b_count += 1
+        if self.b_count == self.b_count_check:
+            self.b = self.b_store.copy()
+            # self.b_store = [np.zeros(self.AMMO), np.zeros(self.AMMO)]
+            self.b_count = 1
 
         self.time += time.time() - t1
 
@@ -556,19 +563,19 @@ class LazyCFR:
 
 
 
-            mod = self.round // 100
-            KL = 0.0 / (mod + 1.0)
-            if self.last_stgy[player] != None:
-                vals = []
-                for infoset_id in self.visited[player][::-1]:
-                    sum_vals = 0.0
-                    for i, seq in enumerate(self.game.seqs[player][infoset_id]):
-                        strat = self.stgy[player][infoset_id][i]
-                        ref_strat = self.stgy_br[player][infoset_id][i]
-                        new_rew = min((KL / strat) * (ref_strat - strat), 10)
-                        new_rew = max(new_rew, 1e-10)
-                        # new_rew = 0.0
-                        self.b_xi[player][seq] += new_rew
+            # mod = self.round // 100
+            # KL = 0.0 / (mod + 1.0)
+            # if self.last_stgy[player] != None:
+            #     vals = []
+            #     for infoset_id in self.visited[player][::-1]:
+            #         sum_vals = 0.0
+            #         for i, seq in enumerate(self.game.seqs[player][infoset_id]):
+            #             strat = self.stgy[player][infoset_id][i]
+            #             ref_strat = self.stgy_br[player][infoset_id][i]
+            #             new_rew = min((KL / strat) * (ref_strat - strat), 10)
+            #             new_rew = max(new_rew, 1e-10)
+            #             # new_rew = 0.0
+            #             self.b_xi[player][seq] += new_rew
 
 
 
@@ -632,9 +639,11 @@ class LazyCFR:
         else:
             # Second update rule of FLBR
             # KOMWU uses K_j's and b's here
-            eta = 1.0 # / 9.0  #1 flbr not working 44 mil
+            #eta = 1.0 # / 9.0  #1 flbr not working 44 mil
             # eta = np.sqrt(np.log(2) / (self.round +  1.0))
-            self.b[player] += eta * self.grad[player]
+            self.b[player] += self.eta * self.grad[player]
+            if self.b_count >= self.b_count_count_at:
+                self.b_store[player] += self.eta * self.grad[player]
 
             # KL = 1.0
             # if self.last_stgy[player] != None:

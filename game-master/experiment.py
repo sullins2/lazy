@@ -43,7 +43,7 @@ dcfr_params = [1.5, 0.0, 2.0]
 if betm>7:
 	game = Game(path=savepath+".npz")
 else:
-	betm = 6
+	betm = 2
 	game = Game( bidmaximum =betm) #path=savepath+".npz")#bidmaximum=betmpath=
 
 # This is for Kuhn - doesn't have betm..
@@ -80,40 +80,28 @@ reporttimes=[10, 10, 10, 10, 10, 20, 60, 100, 200, 300, 600, 500]
 printround=[10000, 8000, 6000, 4000, 2000, 100, 50, 200, 100, 50, 1, 1]
 
 # CHECK EXPLOITABILITY CALC CODE
-
-
-
-
-# LEDUC-3 works well
-# params = {}
-# params["thres"] = -0.008 #0.004#0.01 #0.06
-# params["entropy"] = -6.0
-# params["mod_value"] = 1000
-# params["KL"] = -3.0
-# params["KL_mod"] = 1000
-# params["optimism"] = 2.0
-# params["eta"] = 1.0
-# params["entropy_twice"] = False
-# params["final_exploit"] = 1e-12
-# params["AMMO"] = 500000
-
-
 # figure out why rewards change results
 # Story: If you can get last iterate convergence, this helps. Otherwise, doesn't help average policy
 # BEER GAME - for early fall
 params = {}
-params["thres"] = 0.005
+params["thres"] = -0.005
 params["entropy"] = 0#-1
 params["mod_value"] = 10000
 params["KL"] = 0 #-400.0
 params["KL_mod"] = 10000
 params["optimism"] = 2.0
-params["eta"] = 1.0
+params["eta"] = 2.0 #1.0
 params["entropy_twice"] = False
 params["final_exploit"] = 1e-12
 params["AMMO"] = 500000
-params["b_count"] = 20 # Set to negative to disable
-params["b_count_count_at"] = 9 
+params["b_count"] = [20]
+params["b_count_count_at"] = [10]
+
+# TODO see if something works here
+# params["b_count"] = [20 for _ in range(20)] #[20, 20, 20, 20, 50] #-20 # Set to negative to disable
+# params["b_count"].append(100)
+# params["b_count_count_at"] = [10 for _ in range(20)] #[10, 10, 10, 10, 25] #1
+# params["b_count_count_at"].append(50)
 
 # TODO TRY 10 5
 # Leduc-5 (regular KOMWU = 43m)
@@ -133,7 +121,13 @@ params["b_count_count_at"] = 9
 
 # Leduc-6
 # 36 15 thres=0.007 25,804,088
+# 36 15 thres=0.006 23,474,436
 # 20  9 thres=0.006 11,778,214
+# 20  9 thres=0.007 23,647,522
+# 20  9 thres=0.005 19,705,128
+# 20  8 thres=0.006 16,133,824
+# 21  9 thres=0.006 14,561,912
+# 21 10 thres=0.006 23,007,380
 
 # Try starting b_count at negative, or some way of letting it get going faster initially?
 # Note: In NFGs, higher is better until it breaks
@@ -230,7 +224,7 @@ def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 		plot_its = []
 		stgy = None
 		quit = False
-		Z = 2000
+		Z = 4000
 		while z <= Z: #: 0000000: #cumutime + time.time() - timestamp < timelim or gamesolver.nodestouched < minimum:
 			z += 1
 			plot_its.append(z)
@@ -281,31 +275,31 @@ def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 		# 	print("EXL:", expl_plot[-i])
 		# print("EXPLOTS:", expl_plot[-1])
 
-		# LOG PLOT (NOT WORKING)
+		# LOG PLOT
 		# plt.xlabel('Nodes Touched')
 		# plt.ylabel('Exploitability')
 		# plt.xscale('log')  # Set x-axis to log scale
 		# plt.yscale('log')  # Set y-axis to log scale
-		# This breaks the plot
-		# plt.xlim(1e0, 1e5)  # Set x-axis range from 1 to 10^5
+		# # This breaks the plot
+		# plt.xlim(1, 1e7)  # Set x-axis range from 1 to 10^5
 		# plt.ylim(1e-12, 1e1)  # Set y-axis range from 10^-12 to 1
 		# plt.plot(expl_iters, expl_plot, 'b-', label='Lazy-KFLBR')
 		# plt.legend()
 		# plt.show()
 
-		plt.plot(expl_iters, expl_plot, 'b-', label='None')
-		plt.xlabel('Nodes Touched')
-		plt.ylabel('Exploitability')
-		# Set the axis scale to logarithmic
-		plt.xscale('log')
-		plt.yscale('log')
-		# Set the axis limits
-		plt.xlim(1, 1e7)  # x-axis limits from 1 to 100000 (10^5)
-		plt.ylim(1e-8, 1)  # y-axis limits from 10^-12 to 1
-
-		# plt.ylim(0.0, 1.0)  # Set y-axis range
-		plt.legend()
-		plt.show()
+		# FOR REGULAR PLOTTING
+		# plt.plot(expl_iters, expl_plot, 'b-', label='None')
+		# plt.xlabel('Nodes Touched')
+		# plt.ylabel('Exploitability')
+		# # Set the axis scale to logarithmic
+		# plt.xscale('log')
+		# plt.yscale('log')
+		# # Set the axis limits
+		# plt.xlim(1, 1e15)  # x-axis limits from 1 to 100000 (10^5)
+		# plt.ylim(1e-8, 1)  # y-axis limits from 10^-12 to 1
+		# # plt.ylim(0.0, 1.0)  # Set y-axis range
+		# plt.legend()
+		# plt.show()
 
 		# Plot optimism levels throughout run
 		# plt.plot(expl_iters, gamesolver.opt_levels, 'b-', label='Lazy-KFLBR')
@@ -338,12 +332,12 @@ def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 		print("shape", len(expls), len(times), len(nodes))
 		# print("HERE: ", gamesolver.stgy[0])
 		# print("THIS: ", gamesolver.stgy[0][17])
-		print(gamesolver.stgy[0][21:61])
-		print("JACK:", gamesolver.stgy[0][4][0], "OTHER:", gamesolver.stgy[0][20][0], "JACK+0.3333", gamesolver.stgy[0][4][0] + 0.33333333 )
-		print("DIF: ", np.abs(gamesolver.stgy[0][4][0] + 0.333333333333333333 - gamesolver.stgy[0][20][0]))
+		# print(gamesolver.stgy[0][21:61])
+		# print("JACK:", gamesolver.stgy[0][4][0], "OTHER:", gamesolver.stgy[0][20][0], "JACK+0.3333", gamesolver.stgy[0][4][0] + 0.33333333 )
+		# print("DIF: ", np.abs(gamesolver.stgy[0][4][0] + 0.333333333333333333 - gamesolver.stgy[0][20][0]))
 
 
-		return (expls, times, nodes, stgy, expl)
+		return (expls, times, nodes, stgy, expl, expl_iters, expl_plot)
 	print("initializing solver")
 	solver = None
 	if solvername == "cfr":
@@ -358,14 +352,65 @@ def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 	if solvername == "lazycfr":
 		solver = Lazycfr.LazyCFR(game, Type=Type, thres=thres, params=dcfr_params)
 	if solvername == "lazyflbr":
-		solver = Lazycfr_FLBR.LazyCFR(game, Type=Type, thres=thres)
+		solver = Lazycfr_FLBR.LazyCFR(game, Type=Type, thres=thres, params=params)
 	if solvername == "komwu":
 		solver = Komwu.KOMWU(game, Type=Type, thres=thres)
 
 	res = solve(solver)
 	return res
 
+# res = run(game, Type=Type, solvername=algo)
+
+# game = KuhnGame( bidmaximum =betm)
+betm = 5
+game = Game( bidmaximum =betm)
+params["thres"] = -0.005
+params["eta"] = 20.0 #1.0
+params["final_exploit"] = 1e-12
+params["b_count"] = [-20] # Set to negative to disable
+params["b_count_count_at"] = [10]
 res = run(game, Type=Type, solvername=algo)
+its0 = res[5]
+plots0 = res[6]
+
+# TODO run the large kuhn longer
+game = Game( bidmaximum =betm) #path=savepath+".npz")#bidmaximum=betmpath=
+# game = KuhnGame( bidmaximum =betm)
+params["thres"] = -0.005
+params["eta"] = 20.0 #1.0
+params["final_exploit"] = 1e-12
+params["b_count"] = [20] # Set to negative to disable
+params["b_count_count_at"] = [10]
+res = run(game, Type=Type, solvername=algo)
+its1 = res[5]
+plots1 = res[6]
+#
+# game = KuhnGame( bidmaximum =betm)
+game = Game( bidmaximum =betm) #path=savepath+".npz")#bidmaximum=betmpath=
+params["thres"] = 0.005
+params["eta"] = 20.0 #1.0
+params["final_exploit"] = 1e-12
+params["b_count"] = [20] #36 # Set to negative to disable
+params["b_count_count_at"] = [10] #15
+res = run(game, Type=Type, solvername=algo)
+its2 = res[5]
+plots2 = res[6]
+
+
+plt.plot(its0, plots0, 'b-', label='KOMWU')
+plt.plot(its1, plots1, 'r-', label='KOMWU_b')
+plt.plot(its2, plots2, 'g-', label='KOMWU_b_l')
+plt.xlabel('Nodes Touched')
+plt.ylabel('Exploitability')
+# Set the axis scale to logarithmic
+plt.xscale('log')
+plt.yscale('log')
+# Set the axis limits
+plt.xlim(1, 1e9)  # x-axis limits from 1 to 100000 (10^5)
+plt.ylim(1e-20, 1)  # y-axis limits from 10^-12 to 1
+# plt.ylim(0.0, 1.0)  # Set y-axis range
+plt.legend()
+plt.show()
 
 
 #-----------------------------------

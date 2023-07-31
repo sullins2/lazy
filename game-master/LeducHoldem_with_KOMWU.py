@@ -6,7 +6,7 @@ import time
 class Game:
     def __init__(self, path=-1, cards=3, bidmaximum=6, tosave=False):
         self.bidmaximum = bidmaximum
-        self.cards = cards
+        self.cards = 4#cards
         self.numHists = 0
         self.numIsets = [0, 0]
         self.isTerminal = []

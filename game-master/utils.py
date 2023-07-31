@@ -6,12 +6,15 @@ class RegretSolver:
 	def __init__(self, dim, params):
 		self.round = 0
 		self.sumRewVector = np.zeros(dim)
+		# self.sumRewVector_b = np.zeros(dim)
 		self.sumStgyVector = np.zeros(dim)
 		self.gained = 0
+		# self.gained_b = 0
 		self.sumWeight = 0.0
 		self.dim = dim
 		self.curstgy = np.ones(dim) / self.dim
 		self.regret = np.zeros(dim)
+		self.b_count = 1
 
 	# REGRET MATCHING
 	# dim IS INITIALIZED TO THE NUMBER OF ACTIONS IN THIS INFOSET
@@ -40,6 +43,25 @@ class RegretSolver:
 		# print("WEIGHTLL", weight)
 		self.curstgy = stgy.copy()
 		self.sumWeight += weight
+
+		# STUFF FOR B STUFF - doesn't work
+		# self.b_count += 1
+		# self.gained += curgain
+		# self.round += 1
+		# self.sumRewVector += rew
+		# self.sumStgyVector += self.curstgy * weight  # avg policy is cur_pol * rp
+		# # print("WEIGHTLL", weight)
+		# self.curstgy = stgy.copy()
+		# self.sumWeight += weight
+		# if self.b_count >= 30:
+		# 	self.gained_b += curgain
+		# 	self.sumRewVector_b += rew
+		#
+		# if self.b_count == 60:
+		# 	self.b_count = 1
+		# 	self.gained = self.gained_b.copy()
+		# 	self.sumRewVector_b = self.sumRewVector.copy()
+
 
 	def avg(self):
 		if self.sumWeight < 1e-8:

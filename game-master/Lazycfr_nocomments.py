@@ -373,10 +373,14 @@ class LazyCFR:
         self.updateKomwu(1, t)
 
         self.b_count += 1
-        if self.b_count == self.b_count_check:
+        if self.b_count == self.b_count_check[0]:
             self.b = self.b_store.copy()
             # self.b_store = [np.zeros(self.AMMO), np.zeros(self.AMMO)]
             self.b_count = 1
+            if len(self.b_count_check) > 1:
+                self.b_count_check.pop(0)
+                self.b_count_count_at.pop(0)
+
 
         # if t % 20 == 0:
         #     self.last_stgy[0] = copy.deepcopy(self.stgy[0])
@@ -528,7 +532,7 @@ class LazyCFR:
         # self.last_entropy[player] = entropy[player].copy()
 
         optimistic_gradient = self.opt[player] * self.grad[player] - self.last_opt[player] * self.last_gradient[player]
-        # optimistic_gradient = 2.0 * self.grad[player] - 0.5 * self.last_gradient[player] - 0.5*self.last_last_gradient[player]
+        # optimistic_gradient = 1.0 * self.grad[player] #- 0.5 * self.last_gradient[player] - 0.5*self.last_last_gradient[player]
         # print(optimistic_gradient)
         # if player == 0:
         #     print(self.grad[player])
@@ -539,8 +543,10 @@ class LazyCFR:
         self.last_gradient[player] = self.grad[player].copy()
 
         self.b[player] += self.eta * optimistic_gradient
-        if self.b_count >= self.b_count_count_at:
+
+        if self.b_count >= self.b_count_count_at[0]:
             self.b_store[player] += self.eta * optimistic_gradient
+
 
         self.last_opt[player] = self.opt[player] - 1.0
         self.last_stgy[player] = copy.deepcopy(self.stgy[player])
