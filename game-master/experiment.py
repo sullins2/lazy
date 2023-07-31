@@ -366,7 +366,7 @@ betm = 5
 # TODO LEDUC 4 IS RUNNING
 game = Game( bidmaximum =betm)
 params["thres"] = 0.008
-params["eta"] = 3.0 #1.0
+params["eta"] = 20.0 #1.0
 params["final_exploit"] = 1e-12
 params["b_count"] = [20] # Set to negative to disable
 params["b_count_count_at"] = [9]
@@ -377,8 +377,8 @@ plots0 = res[6]
 
 game = Game( bidmaximum =betm) #path=savepath+".npz")#bidmaximum=betmpath=
 # game = KuhnGame( bidmaximum =betm)
-params["thres"] = 0.008
-params["eta"] = 10.0 #1.0
+params["thres"] = 0.007
+params["eta"] = 20.0 #1.0
 params["final_exploit"] = 1e-12
 params["b_count"] = [20] # Set to negative to disable
 params["b_count_count_at"] = [9]
@@ -389,8 +389,8 @@ plots1 = res[6]
 #
 # game = KuhnGame( bidmaximum =betm)
 game = Game( bidmaximum =betm) #path=savepath+".npz")#bidmaximum=betmpath=
-params["thres"] = 0.008
-params["eta"] = 5.0 #1.0
+params["thres"] = 0.009
+params["eta"] = 20.0 #1.0
 params["final_exploit"] = 1e-12
 params["b_count"] = [20] #36 # Set to negative to disable
 params["b_count_count_at"] = [9] #15
