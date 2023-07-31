@@ -370,6 +370,7 @@ params["eta"] = 3.0 #1.0
 params["final_exploit"] = 1e-12
 params["b_count"] = [20] # Set to negative to disable
 params["b_count_count_at"] = [9]
+print(params)
 res = run(game, Type=Type, solvername=algo)
 its0 = res[5]
 plots0 = res[6]
@@ -381,6 +382,7 @@ params["eta"] = 10.0 #1.0
 params["final_exploit"] = 1e-12
 params["b_count"] = [20] # Set to negative to disable
 params["b_count_count_at"] = [9]
+print(params)
 res = run(game, Type=Type, solvername=algo)
 its1 = res[5]
 plots1 = res[6]
@@ -392,6 +394,7 @@ params["eta"] = 5.0 #1.0
 params["final_exploit"] = 1e-12
 params["b_count"] = [20] #36 # Set to negative to disable
 params["b_count_count_at"] = [9] #15
+print(params)
 res = run(game, Type=Type, solvername=algo)
 its2 = res[5]
 plots2 = res[6]
