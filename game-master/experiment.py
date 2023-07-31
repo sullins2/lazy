@@ -43,7 +43,7 @@ dcfr_params = [1.5, 0.0, 2.0]
 if betm>7:
 	game = Game(path=savepath+".npz")
 else:
-	betm = 6
+	betm = 7
 	game = Game( bidmaximum =betm) #path=savepath+".npz")#bidmaximum=betmpath=
 
 # This is for Kuhn - doesn't have betm..
@@ -102,7 +102,7 @@ printround=[10000, 8000, 6000, 4000, 2000, 100, 50, 200, 100, 50, 1, 1]
 # Story: If you can get last iterate convergence, this helps. Otherwise, doesn't help average policy
 # BEER GAME - for early fall
 params = {}
-params["thres"] = 0.006
+params["thres"] = 0.008
 params["entropy"] = 0#-1
 params["mod_value"] = 10000
 params["KL"] = 0 #-400.0
@@ -112,8 +112,8 @@ params["eta"] = 20.0
 params["entropy_twice"] = False
 params["final_exploit"] = 1e-12
 params["AMMO"] = 500000
-params["b_count"] = 21 # Set to negative to disable
-params["b_count_count_at"] = 10 
+params["b_count"] = 20 # Set to negative to disable
+params["b_count_count_at"] = 9 
 
 # TODO TRY 10 5
 # Leduc-5 (regular KOMWU = 43m)
