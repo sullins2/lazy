@@ -365,11 +365,11 @@ def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 betm = 7
 # TODO LEDUC 4 IS RUNNING
 game = Game( bidmaximum =betm)
-params["thres"] = 0.008
-params["eta"] = 20.0 #1.0
+params["thres"] = 0.1
+params["eta"] = 1.0 #1.0
 params["final_exploit"] = 1e-12
-params["b_count"] = [10] # Set to negative to disable
-params["b_count_count_at"] = [5]
+params["b_count"] = [20] # Set to negative to disable
+params["b_count_count_at"] = [8]
 print(params)
 res = run(game, Type=Type, solvername=algo)
 its0 = res[5]
