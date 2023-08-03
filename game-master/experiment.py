@@ -224,7 +224,7 @@ def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 		plot_its = []
 		stgy = None
 		quit = False
-		Z = 10 #4000
+		Z = 4000
 		while z <= Z: #: 0000000: #cumutime + time.time() - timestamp < timelim or gamesolver.nodestouched < minimum:
 			z += 1
 			plot_its.append(z)
