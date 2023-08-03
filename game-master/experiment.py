@@ -8,7 +8,6 @@ import utils
 from utils import RegretSolver, exploitability, generateOutcome, RegretSolverPlus, generateB, generateOutcomeFinal
 import time
 import matplotlib.pyplot as plt
-%matplotlib inline
 
 import mccfr
 import Lazycfr
@@ -363,13 +362,13 @@ def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 # res = run(game, Type=Type, solvername=algo)
 
 # game = KuhnGame( bidmaximum =betm)
-betm = 3
+betm = 5
 # TODO LEDUC 4 IS RUNNING
 game = Game( bidmaximum =betm)
-params["thres"] = 0.2
+params["thres"] = -0.2
 params["eta"] = 1.0 #1.0
 params["final_exploit"] = 1e-12
-params["b_count"] = [20] # Set to negative to disable
+params["b_count"] = [-20] # Set to negative to disable
 params["b_count_count_at"] = [8]
 print(params)
 res = run(game, Type=Type, solvername=algo)
