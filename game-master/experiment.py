@@ -8,6 +8,7 @@ import utils
 from utils import RegretSolver, exploitability, generateOutcome, RegretSolverPlus, generateB, generateOutcomeFinal
 import time
 import matplotlib.pyplot as plt
+%matplotlib inline
 
 import mccfr
 import Lazycfr
