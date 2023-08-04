@@ -368,8 +368,8 @@ game = Game( bidmaximum =betm)
 params["thres"] = 0.3
 params["eta"] = 1.0 #1.0
 params["final_exploit"] = 1e-12
-params["b_count"] = [10] # Set to negative to disable
-params["b_count_count_at"] = [5]
+params["b_count"] = [30] # Set to negative to disable
+params["b_count_count_at"] = [10]
 print(params)
 res = run(game, Type=Type, solvername=algo)
 its0 = res[5]
