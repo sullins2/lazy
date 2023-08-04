@@ -362,7 +362,7 @@ def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 # res = run(game, Type=Type, solvername=algo)
 
 # game = KuhnGame( bidmaximum =betm)
-betm = 5
+betm = 5 
 # TODO LEDUC 4 IS RUNNING
 game = Game( bidmaximum =betm)
 params["thres"] = 0.3
