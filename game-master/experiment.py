@@ -362,14 +362,14 @@ def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 # res = run(game, Type=Type, solvername=algo)
 
 # game = KuhnGame( bidmaximum =betm)
-betm = 5
+betm = 6
 # TODO LEDUC 4 IS RUNNING
 game = Game( bidmaximum =betm)
-params["thres"] = -0.2
+params["thres"] = 0.04
 params["eta"] = 1.0 #1.0
 params["final_exploit"] = 1e-12
-params["b_count"] = [-20] # Set to negative to disable
-params["b_count_count_at"] = [8]
+params["b_count"] = [20] # Set to negative to disable
+params["b_count_count_at"] = [10]
 print(params)
 res = run(game, Type=Type, solvername=algo)
 its0 = res[5]
