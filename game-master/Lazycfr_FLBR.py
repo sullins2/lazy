@@ -435,9 +435,9 @@ class LazyCFR:
         self.updateKomwu(0, first_step=True, t=t)
         self.updateKomwu(1, first_step=True, t=t)
 
-        if t % 10 == 0:
-            self.stgy_br[0] = copy.deepcopy(self.stgy_xi[0])
-            self.stgy_br[1] = copy.deepcopy(self.stgy_xi[1])
+        # if t % 10 == 0:
+        #     self.stgy_br[0] = copy.deepcopy(self.stgy_xi[0])
+        #     self.stgy_br[1] = copy.deepcopy(self.stgy_xi[1])
 
         # Reset for second update rule
         self.reachp[0][0] += 1  # These are set to zero in line just above so only ever have values 0 or 1
@@ -491,11 +491,11 @@ class LazyCFR:
 
         self.probNotUpdatedFirstCopy = [np.zeros((game.numHists, 2)), np.zeros((game.numHists, 2))]
 
-        self.b_count += 1
-        if self.b_count == self.b_count_check:
-            self.b = self.b_store.copy()
-            # self.b_store = [np.zeros(self.AMMO), np.zeros(self.AMMO)]
-            self.b_count = 1
+        # self.b_count += 1
+        # if self.b_count == self.b_count_check:
+        #     self.b = self.b_store.copy()
+        #     # self.b_store = [np.zeros(self.AMMO), np.zeros(self.AMMO)]
+        #     self.b_count = 1
 
         self.time += time.time() - t1
 
@@ -530,16 +530,7 @@ class LazyCFR:
         # self.K_j_first_step = [[None] * self.AMMO, [None] * self.AMMO]
 
         if first_step:
-            xi = 100.0
-            # if t % 2 == 0 and player == 0:
-            #     xi = 100.0
-            # elif t % 2 == 0 and player == 1:
-            #     xi = -100.0
-            # if t % 2 != 0 and player == 1:
-            #     xi = 100.0
-            # elif t % 2 != 0 and player == 0:
-            #     xi = -100.0
-            # print(t % 2, player)
+            xi = 100.0 # Try smaller with laziness
             self.b_xi[player] = self.b[player].copy() # Copy the current b
 
             ####### ENTROPY ##################
@@ -560,7 +551,15 @@ class LazyCFR:
 
 
             self.b_xi[player] += xi * self.grad[player] # Add the current utility times xi
-
+            # for ii in range(len(self.b_xi[player])):
+            #     if ii in self.game.seqs_depth[player]:
+            #         xi = 10.0 * self.game.seqs_depth[player][ii]
+            #         # print("HERE", xi)
+            #     else:
+            #         # print("NOW HERE", ii)
+            #         # print(self.game.seqs_depth[player])
+            #         xi = 1.0
+            #     self.b_xi[player][ii] += xi * self.grad[player][ii]
 
 
             # mod = self.round // 100
@@ -642,8 +641,8 @@ class LazyCFR:
             #eta = 1.0 # / 9.0  #1 flbr not working 44 mil
             # eta = np.sqrt(np.log(2) / (self.round +  1.0))
             self.b[player] += self.eta * self.grad[player]
-            if self.b_count >= self.b_count_count_at:
-                self.b_store[player] += self.eta * self.grad[player]
+            # if self.b_count >= self.b_count_count_at:
+            #     self.b_store[player] += self.eta * self.grad[player]
 
             # KL = 1.0
             # if self.last_stgy[player] != None:

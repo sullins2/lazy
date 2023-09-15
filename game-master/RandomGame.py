@@ -28,11 +28,19 @@ class Game:
         self.numInfoSets = [0, 0]
         self.totalSeqs = [-1, -1]
         self.seqs = [{}, {}]
+        self.seqs_depth = [{}, {}]
         self.childrenInfosets = [{}, {}]  # seq -> [infosetid, ...]
         self.parSeq = [{}, {}]
         # np.random.seed(12181)  #This one shows OMWU_b alright # 20 10 eta=1
         # np.random.seed(10021) #OMWU_b is slightly better than regular # 20 10 eta=1 e-7 / e-10
-        np.random.seed(100)
+        np.random.seed(10000) # 10000 good example, takes the full 4000 iterations, 100 shows entropy
+                            # THESE ARE FOR SEED=10000
+                            # params["entropy"] = 0  # -0.1
+                            # params["thres"] = -0.008
+                            # params["eta"] = 5.0  # 1.0
+                            # params["final_exploit"] = 1e-12
+                            # params["b_count"] = [10]  # 36 # Set to negative to disable
+                            # params["b_count_count_at"] = [5]  # 15
         self.reward1 = np.random.randint(-10, 11)
         self.reward2 = np.random.randint(-10, 11)
         self.reward3 = np.random.randint(-10, 11)
@@ -188,6 +196,7 @@ class Game:
                 for ii in range(1, genNactsOnIset(0) + 1):
                     seqs0.append(self.totalSeqs[0] + ii)
                     totseqs0[ii - 1].append(self.totalSeqs[0] + ii)
+                    self.seqs_depth[player][self.totalSeqs[0] + ii] = depth
                 self.seqs[0][self.numIsets[0]] = seqs0
                 self.numInfoSets[0] += 1
                 self.totalSeqs[0] += genNactsOnIset(0)
@@ -241,6 +250,7 @@ class Game:
                 for ii in range(1, genNactsOnIset(1) + 1):
                     seqs1.append(self.totalSeqs[1] + ii)
                     totseqs1[ii - 1].append(self.totalSeqs[1] + ii)
+                    self.seqs_depth[player][self.totalSeqs[1] + ii] = depth
                 #     # self.seqs[1].append(seqs1)
                 self.seqs[1][self.numIsets[1]] = seqs1
                 self.numInfoSets[1] += 1
@@ -369,15 +379,15 @@ class Game:
                     if win == 0:
                         self.reward[int(histids[i][j])] = (0, 0)
                     elif win == 1:
-                        # f = np.random.uniform(0, 7)
-                        # self.reward[int(histids[i][j])] = (f, f)
-                        # self.reward[int(histids[i][j])] = (bids[1] + 0.5, bids[1] + 0.5)
+                        f = np.random.uniform(0, 2)
+                        # self.reward[int(histids[i][j])] = (f, -f)
+                        # self.reward[int(histids[i][j])] = (bids[1] + f, -bids[1] - f)
                         self.reward[int(histids[i][j])] = (bids[1] + 0.5, -bids[1] - 0.5) # REG
                     elif win == -1:
-                        # f = np.random.uniform(0, 7)
-                        # self.reward[int(histids[i][j])] = (f, f)
+                        f = np.random.uniform(0, 2)
+                        # self.reward[int(histids[i][j])] = (-f, f)
                         self.reward[int(histids[i][j])] = (-bids[0] - 1.0, bids[0] + 1.0) # REG
-                        # self.reward[int(histids[i][j])] = (bids[0] + 1.0, bids[0] + 1.0)
+                        # self.reward[int(histids[i][j])] = (-bids[0] - f, bids[0] + f)
                 # # print("Just set a terminal")
             return  # histids, isetids
 

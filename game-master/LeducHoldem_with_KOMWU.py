@@ -6,7 +6,7 @@ import time
 class Game:
     def __init__(self, path=-1, cards=3, bidmaximum=6, tosave=False):
         self.bidmaximum = bidmaximum
-        self.cards = 4#cards
+        self.cards = cards
         self.numHists = 0
         self.numIsets = [0, 0]
         self.isTerminal = []
@@ -28,6 +28,7 @@ class Game:
         self.numInfoSets = [0, 0]
         self.totalSeqs = [-1, -1]
         self.seqs = [{}, {}]
+        self.seqs_depth = [{}, {}]
         self.childrenInfosets = [{}, {}]  # seq -> [infosetid, ...]
         self.parSeq = [{}, {}]
 
@@ -179,6 +180,7 @@ class Game:
                 for ii in range(1, genNactsOnIset(0) + 1):
                     seqs0.append(self.totalSeqs[0] + ii)
                     totseqs0[ii - 1].append(self.totalSeqs[0] + ii)
+                    self.seqs_depth[player][self.totalSeqs[0] + ii] = depth
                 self.seqs[0][self.numIsets[0]] = seqs0
                 self.numInfoSets[0] += 1
                 self.totalSeqs[0] += genNactsOnIset(0)
@@ -230,6 +232,7 @@ class Game:
                 for ii in range(1, genNactsOnIset(1) + 1):
                     seqs1.append(self.totalSeqs[1] + ii)
                     totseqs1[ii - 1].append(self.totalSeqs[1] + ii)
+                    self.seqs_depth[player][self.totalSeqs[1] + ii] = depth
                 #     # self.seqs[1].append(seqs1)
                 self.seqs[1][self.numIsets[1]] = seqs1
                 self.numInfoSets[1] += 1
@@ -343,6 +346,7 @@ class Game:
                         self.reward[int(histids[i][j])] = (0, 0)
                     elif win == 1:
                         self.reward[int(histids[i][j])] = (bids[1] + 0.5, -bids[1] - 0.5)
+                        # print(self.reward[int(histids[i][j])])
                     elif win == -1:
                         self.reward[int(histids[i][j])] = (-bids[0] - 1, bids[0] + 1)
                 # # print("Just set a terminal")

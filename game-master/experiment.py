@@ -1,6 +1,6 @@
 import numpy as np
-# from LeducHoldem_with_KOMWU import Game
-from RandomGame import Game
+from LeducHoldem_with_KOMWU import Game
+# from RandomGame import Game
 from Kuhn_with_KOMWU import KuhnGame
 import copy
 import queue
@@ -85,15 +85,15 @@ printround=[10000, 8000, 6000, 4000, 2000, 100, 50, 200, 100, 50, 1, 1]
 # BEER GAME - for early fall
 params = {}
 params["thres"] = -0.005
-params["entropy"] = 0#-1
+params["entropy"] = 0
 params["mod_value"] = 10000
-params["KL"] = 0 #-400.0
+params["KL"] = 0 #1.0 #-400.0
 params["KL_mod"] = 10000
 params["optimism"] = 2.0
 params["eta"] = 2.0 #1.0
 params["entropy_twice"] = False
 params["final_exploit"] = 1e-12
-params["AMMO"] = 500000
+params["AMMO"] = 50000
 params["b_count"] = [20]
 params["b_count_count_at"] = [10]
 
@@ -104,7 +104,7 @@ params["b_count_count_at"] = [10]
 # params["b_count_count_at"].append(50)
 
 # TODO TRY 10 5
-# Leduc-5 (regular KOMWU = 43m)
+# Leduc-5 (regular KOMWU = 44m)
 # 30 15 24,904,660
 # 20 10 29,299,600
 # 20  6 thres=0.008 6,318,790
@@ -118,6 +118,8 @@ params["b_count_count_at"] = [10]
 # 36 15 thres=0.008 5,450,058
 # 36 20 thres=0.008 5,900,158
 # 36 10 thres=0.008 7,145,102
+# 20  9 thres=0.009 3,583,380
+# 20  9 thres=0.008 4,093,510
 
 # Leduc-6
 # 36 15 thres=0.007 25,804,088
@@ -224,7 +226,7 @@ def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 		plot_its = []
 		stgy = None
 		quit = False
-		Z = 4000
+		Z = 400000
 		while z <= Z: #: 0000000: #cumutime + time.time() - timestamp < timelim or gamesolver.nodestouched < minimum:
 			z += 1
 			plot_its.append(z)
@@ -335,7 +337,7 @@ def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 		# print(gamesolver.stgy[0][21:61])
 		# print("JACK:", gamesolver.stgy[0][4][0], "OTHER:", gamesolver.stgy[0][20][0], "JACK+0.3333", gamesolver.stgy[0][4][0] + 0.33333333 )
 		# print("DIF: ", np.abs(gamesolver.stgy[0][4][0] + 0.333333333333333333 - gamesolver.stgy[0][20][0]))
-
+		# print(gamesolver.stgy)
 
 		return (expls, times, nodes, stgy, expl, expl_iters, expl_plot)
 	print("initializing solver")
@@ -362,54 +364,122 @@ def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 # res = run(game, Type=Type, solvername=algo)
 
 # game = KuhnGame( bidmaximum =betm)
-betm = 5
-# TODO LEDUC 4 IS RUNNING
-game = Game( bidmaximum =betm)
-params["thres"] = 0.008
-params["eta"] = 3.0 #1.0
-params["final_exploit"] = 1e-12
-params["b_count"] = [20] # Set to negative to disable
-params["b_count_count_at"] = [9]
-print(params)
-res = run(game, Type=Type, solvername=algo)
-its0 = res[5]
-plots0 = res[6]
+# Leduc-4 reg 4.8
+# WITH thres=0.005
+# eta=3 20/9 3.59m
+# eta=10 20/9 1.39m
+# eta=20 20/9 970k
+# eta=20 20/9 thres=0.006 926k
+# eta=20 20/9 thres=0.007 937k
+# eta=20 20/9 thres=0.008 824k
 
+# Leduc-4 with 4 cards reg 14.7m
+# eta=20 20/9 thres=0.007 2,214,595
+# eta=20 20/9 thres=0.006 2,043,093
+# eta=20 20/9 thres=0.008 1,762,749
+# eta=20 20/9 thres=0.009 2,438,056
+# eta=20 20/9 thres=0.01  1,767,826
+# eta=20 20/10 thres=0.008 1,778,210
+# eta=20 20/8 thres=0.008 2,080,072
+# eta=20 20/7 thres=0.008 1,717,849
+# eta=20 21/7 thres=0.008 1,717,641
+# eta=20 25/10 thres=0.008 1,864,473
+# eta=20 20/6 thres=0.008 1,932,594
+# eta=20 22/7 thres=0.008 1,873,053
+
+
+betm = 6
+algo="lazycfr_nocomments"
+# game = Game( bidmaximum =betm)
+# # game = KuhnGame( bidmaximum =betm)
+# params = {}
+# params["AMMO"] = 50000
+# params["optimism"] = 2.0
+# params["entropy"] = 0
+# params["KL"] = 0
+# params["KL_mod"] = 10000
+# params["thres"] = -1.0
+# params["eta"] = 1.0 # try 10 20
+# params["final_exploit"] = 1e-12
+# params["new_b"] = False
+# params["b_count"] = [20] # Set to negative to disable
+# params["b_count_count_at"] = [8]
+# print(params)
+# res = run(game, Type=Type, solvername=algo)
+# its0 = res[5]
+# plots0 = res[6]
+
+algo="lazycfr_nocomments"
 game = Game( bidmaximum =betm) #path=savepath+".npz")#bidmaximum=betmpath=
 # game = KuhnGame( bidmaximum =betm)
-params["thres"] = 0.008
-params["eta"] = 10.0 #1.0
+params = {}
+params["AMMO"] = 50000
+params["optimism"] = 2.0
+params["entropy"] = 0 #-1
+params["KL"] = 0
+params["KL_mod"] = 10000
+params["thres"] = 0.1
+params["eta"] = 1.0 #1.0
 params["final_exploit"] = 1e-12
+params["new_b"] = True
 params["b_count"] = [20] # Set to negative to disable
-params["b_count_count_at"] = [9]
+params["b_count_count_at"] = [10]
 print(params)
 res = run(game, Type=Type, solvername=algo)
 its1 = res[5]
 plots1 = res[6]
-#
+
 # game = KuhnGame( bidmaximum =betm)
-game = Game( bidmaximum =betm) #path=savepath+".npz")#bidmaximum=betmpath=
-params["thres"] = 0.008
-params["eta"] = 5.0 #1.0
-params["final_exploit"] = 1e-12
-params["b_count"] = [20] #36 # Set to negative to disable
-params["b_count_count_at"] = [9] #15
-print(params)
-res = run(game, Type=Type, solvername=algo)
-its2 = res[5]
-plots2 = res[6]
+# game = Game(bidmaximum=betm) #path=savepath+".npz")#bidmaximum=betmpath=
+# params = {}
+# params["AMMO"] = 50000
+# params["optimism"] = 2.0
+# params["entropy"] = 0
+# params["KL"] = 0
+# params["KL_mod"] = 10000
+# params["thres"] = 0.11
+# params["eta"] = 1.0 #1.0
+# params["final_exploit"] = 1e-12
+# params["new_b"] = False
+# params["b_count"] = [10] #36 # Set to negative to disable
+# params["b_count_count_at"] = [5] #15
+# print(params)
+# res = run(game, Type=Type, solvername=algo)
+# its2 = res[5]
+# plots2 = res[6]
 
+# game = Game(bidmaximum=betm) #path=savepath+".npz")#bidmaximum=betmpath=
+# params = {}
+# params["AMMO"] = 50000
+# params["optimism"] = 2.0
+# params["entropy"] = 0
+# params["KL"] = 0
+# params["KL_mod"] = 10000
+# params["thres"] = 0.12
+# params["eta"] = 1.0 #1.0
+# params["final_exploit"] = 1e-12
+# params["new_b"] = False
+# params["b_count"] = [20] #36 # Set to negative to disable
+# params["b_count_count_at"] = [10] #15
+# print(params)
+# res = run(game, Type=Type, solvername=algo)
+# its3 = res[5]
+# plots3 = res[6]
 
-plt.plot(its0, plots0, 'b-', label='KOMWU')
-plt.plot(its1, plots1, 'r-', label='KOMWU_b')
-plt.plot(its2, plots2, 'g-', label='KOMWU_b_l')
+# different values of thres
+# different values of b_count
+
+# plt.plot(its0, plots0, 'b-', label='KOMWU_05')
+plt.plot(its1, plots1, 'r-', label='KOMWU_06')
+# plt.plot(its2, plots2, 'g-', label='KOMWU_07')
+# plt.plot(its3, plots3, 'm-', label='KOMWU_08')
 plt.xlabel('Nodes Touched')
 plt.ylabel('Exploitability')
 # Set the axis scale to logarithmic
 plt.xscale('log')
 plt.yscale('log')
 # Set the axis limits
-plt.xlim(1, 1e9)  # x-axis limits from 1 to 100000 (10^5)
+plt.xlim(5, 1e9)  # x-axis limits from 1 to 100000 (10^5)
 plt.ylim(1e-20, 1)  # y-axis limits from 10^-12 to 1
 # plt.ylim(0.0, 1.0)  # Set y-axis range
 plt.legend()

@@ -20,13 +20,16 @@ class LazyCFR:
         self.opt = [params["optimism"], params["optimism"]]
         self.last_opt = [params["optimism"] - 1.0, params["optimism"] - 1.0]
         self.eta = params["eta"]
-        self.entropy_twice = params["entropy_twice"]
-        self.mod_value = params["mod_value"]
+        # self.entropy_twice = params["entropy_twice"]
+        # self.mod_value = params["mod_value"]
         self.AMMO = params["AMMO"]
         self.KL_mod = params["KL_mod"]
+        self.new_b = params["new_b"]
         self.b_count_check = params["b_count"]
         self.b_count_count_at = params["b_count_count_at"]
 
+
+        self.RESTART = False
 
         self.time = 0
 
@@ -58,6 +61,8 @@ class LazyCFR:
 
         self.b = [np.zeros(self.AMMO), np.zeros(self.AMMO)]
         self.b_store = [np.zeros(self.AMMO), np.zeros(self.AMMO)]
+        self.b_tally = [np.zeros(self.AMMO), np.zeros(self.AMMO)]
+        self.b_ten = [[],[]]
         self.b_count = 1
         self.last_entropy = [np.zeros(self.AMMO), np.zeros(self.AMMO)]
         # self.b = [np.ones(self.AMMO) * 5.0, np.ones(self.AMMO) * 5.0]
@@ -208,8 +213,6 @@ class LazyCFR:
                 if owner == 1:
                     sign = -1.0
                 if i2 in self.game.isetSuccSeq[owner][i1]:
-                    # print(self.reward[nxthind])
-                    # print(self.reward[nxthind], self.game.reward[nxthind][owner])
                     # game.reward[hist]
                     self.grad[owner][self.game.isetSuccSeq[owner][i1][i2]] += tmp[1 - owner] * self.reward[nxthind] * sign
                     # self.grad[owner][self.game.isetSuccSeq[owner][i1][i2]] += tmp[1 - owner] * self.game.reward[nxthind][owner] #* sign
@@ -279,7 +282,15 @@ class LazyCFR:
 
     def updateAll(self, curexpl, t):
 
-        self.curexpl = curexpl
+        if t == 2:
+            print("Setting initial curexpl:", curexpl)
+            self.curexpl = curexpl
+
+        # if curexpl < 0.9 * self.curexpl: # and len(self.b_ten[0]) >= 10:
+        #     print("RESTART: ", "CURRENT: ", curexpl, " PREV: ", self.curexpl)
+        #     self.curexpl = curexpl
+        #     self.RESTART = True
+
         t1 = time.time()
         game = self.game
         self.round += 1
@@ -308,44 +319,44 @@ class LazyCFR:
         # grad1 = generateB(game,self.stgy_prof, 1)
         # self.grad = [np.array(grad0), np.array(grad1)]
 
-        mod = self.round // self.mod_value
-        ent = self.entropy / np.log(self.round + 2.0) # (mod + 1.0)
-        ent_twice = 2.0 if self.entropy_twice else 1.0
-        total_entropy0 = 0.0
-        total_entropy1 = 0.0
-
-        entropy = [np.zeros(self.AMMO), np.zeros(self.AMMO)]
-        for infoset_id in self.visited[0][::-1]:
-            vals = []
-            sum_vals = 0.0
-            for i, seq in enumerate(self.game.seqs[0][infoset_id]):
-                pol = self.stgy[0][infoset_id][i]
-                if pol <= 0:
-                    pol = 1e-32
-                sum_vals += pol * np.log(pol)
-                total_entropy0 += pol * np.log(pol)
-                vals.append(0)#ent_twice * np.log(pol))
-            for i, seq in enumerate(self.game.seqs[0][infoset_id]):
-                self.b[0][seq] += ent*(vals[i] - sum_vals)
-                # entropy[0][seq] += ent*(vals[i] - sum_vals)
-                entropy[0][seq] += ent*-sum_vals
-                # if t > 20:
-                #     print("Iteration:", t, "seq:", seq, " Value:", ent*(vals[i] - sum_vals))
-
-
-        for infoset_id in self.visited[1][::-1]:
-            vals = []
-            sum_vals = 0.0
-            for i, seq in enumerate(self.game.seqs[1][infoset_id]):
-                pol = self.stgy[1][infoset_id][i]
-                if pol <= 0:
-                    pol = 0.00000000000000000000000000000001
-                sum_vals += pol * np.log(pol)
-                total_entropy1 += pol * np.log(pol)
-                vals.append(0)#ent_twice * np.log(pol))
-            for i, seq in enumerate(self.game.seqs[1][infoset_id]):
-                self.b[1][seq] += ent*(vals[i] - sum_vals) # Always negative
-                entropy[1][seq] += ent * (vals[i] - sum_vals)
+        # mod = self.round // self.mod_value
+        # ent = self.entropy / (mod + 1.0) #np.log(self.round + 2.0) # (mod + 1.0)
+        # ent_twice = 2.0 if self.entropy_twice else 1.0
+        # total_entropy0 = 0.0
+        # total_entropy1 = 0.0
+        #
+        # entropy = [np.zeros(self.AMMO), np.zeros(self.AMMO)]
+        # for infoset_id in self.visited[0][::-1]:
+        #     vals = []
+        #     sum_vals = 0.0
+        #     for i, seq in enumerate(self.game.seqs[0][infoset_id]):
+        #         pol = self.stgy[0][infoset_id][i]
+        #         if pol <= 0:
+        #             pol = 1e-32
+        #         sum_vals += pol * np.log(pol)
+        #         total_entropy0 += pol * np.log(pol)
+        #         vals.append(0)#ent_twice * np.log(pol))
+        #     for i, seq in enumerate(self.game.seqs[0][infoset_id]):
+        #         self.b[0][seq] += ent*(vals[i] - sum_vals)
+        #         # entropy[0][seq] += ent*(vals[i] - sum_vals)
+        #         entropy[0][seq] += ent*-sum_vals
+        #         # if t > 20:
+        #         #     print("Iteration:", t, "seq:", seq, " Value:", ent*(vals[i] - sum_vals))
+        #
+        #
+        # for infoset_id in self.visited[1][::-1]:
+        #     vals = []
+        #     sum_vals = 0.0
+        #     for i, seq in enumerate(self.game.seqs[1][infoset_id]):
+        #         pol = self.stgy[1][infoset_id][i]
+        #         if pol <= 0:
+        #             pol = 0.00000000000000000000000000000001
+        #         sum_vals += pol * np.log(pol)
+        #         total_entropy1 += pol * np.log(pol)
+        #         vals.append(0)#ent_twice * np.log(pol))
+        #     for i, seq in enumerate(self.game.seqs[1][infoset_id]):
+        #         self.b[1][seq] += ent*(vals[i] - sum_vals) # Always negative
+        #         entropy[1][seq] += ent * (vals[i] - sum_vals)
 
         # self.b[0] -= self.last_entropy[0]
         # self.b[1] -= self.last_entropy[1]
@@ -353,38 +364,33 @@ class LazyCFR:
         # self.last_entropy[1] = entropy[1].copy()
 
         # For plotting entropy of stgy
-        if len(self.total_entropy[0]) > 1:
-            self.total_entropy[0].append(self.total_entropy[0][-1] + -total_entropy0)
-            self.total_entropy[1].append(self.total_entropy[1][-1] + -total_entropy1)
-        else:
-            self.total_entropy[0].append(-total_entropy0)
-            self.total_entropy[1].append(-total_entropy1)
+        # if len(self.total_entropy[0]) > 1:
+        #     self.total_entropy[0].append(self.total_entropy[0][-1] + -total_entropy0)
+        #     self.total_entropy[1].append(self.total_entropy[1][-1] + -total_entropy1)
+        # else:
+        #     self.total_entropy[0].append(-total_entropy0)
+        #     self.total_entropy[1].append(-total_entropy1)
 
 
         # Plot strategy
         # self.total_entropy[0].append(self.stgy[0][4][0])
         # self.total_entropy[1].append(self.stgy[1][5][1])
 
-        # self.solvers[owner]
-
-        # print("t",t )
-        # print("VISITED:", len(self.visited[0]))
         self.updateKomwu(0, t)
         self.updateKomwu(1, t)
 
         self.b_count += 1
-        if self.b_count == self.b_count_check[0]:
+        if self.b_count == self.b_count_check[0] and self.new_b:
             self.b = self.b_store.copy()
-            # self.b_store = [np.zeros(self.AMMO), np.zeros(self.AMMO)]
             self.b_count = 1
             if len(self.b_count_check) > 1:
                 self.b_count_check.pop(0)
                 self.b_count_count_at.pop(0)
 
 
-        # if t % 20 == 0:
-        #     self.last_stgy[0] = copy.deepcopy(self.stgy[0])
-        #     self.last_stgy[1] = copy.deepcopy(self.stgy[1])
+        if t > 1 and t % 8 == 0:
+            self.last_stgy[0] = copy.deepcopy(self.stgy[0])
+            self.last_stgy[1] = copy.deepcopy(self.stgy[1])
 
         # for infoset_id in self.visited[0][::-1]:
         #     reg = self.solvers[0][infoset_id].cfrreg()
@@ -492,27 +498,10 @@ class LazyCFR:
 
     def updateKomwu(self, player, t):
 
-        entropy = [np.zeros(self.AMMO), np.zeros(self.AMMO)]
+        # entropy = [np.zeros(self.AMMO), np.zeros(self.AMMO)]
         mod = self.round // self.KL_mod
-        KL = self.KL / np.log(self.round + 2.0) #(mod + 1.0)
+        KL = self.KL / (mod + 1.0) #np.log(self.round + 2.0) #(mod + 1.0)
         # THIS IS THE KL CODE THAT WAS BEING USED
-        if self.last_stgy[player] != None:
-            vals = []
-            for infoset_id in self.visited[player][::-1]:
-                sum_vals = 0.0
-                max_val = 1e-100
-                for i, seq in enumerate(self.game.seqs[player][infoset_id]):
-                    pol = self.stgy[player][infoset_id][i]
-                    old_pol = self.last_stgy[player][infoset_id][i]
-                    pol = np.clip(pol, a_min=np.finfo(float).eps, a_max=None)
-                    old_pol = np.clip(old_pol, a_min=np.finfo(float).eps, a_max=None)
-                    sum_vals += -pol * np.log(pol / old_pol)
-                    # vals.append(-pol * np.log(pol / old_pol))
-                    # max_val = max(max_val, self.b[player][seq])
-                for i, seq in enumerate(self.game.seqs[player][infoset_id]):
-                    self.b[player][seq] += -KL * sum_vals
-                    # print(-KL * sum_vals)
-
         # if self.last_stgy[player] != None:
         #     vals = []
         #     for infoset_id in self.visited[player][::-1]:
@@ -520,18 +509,38 @@ class LazyCFR:
         #         max_val = 1e-100
         #         for i, seq in enumerate(self.game.seqs[player][infoset_id]):
         #             pol = self.stgy[player][infoset_id][i]
-        #             ref_pol = self.last_stgy[player][infoset_id][i]
+        #             old_pol = self.last_stgy[player][infoset_id][i]
         #             pol = np.clip(pol, a_min=np.finfo(float).eps, a_max=None)
-        #             ref_pol = np.clip(ref_pol, a_min=np.finfo(float).eps, a_max=None)
-        #             rew = (KL / pol) * (ref_pol - pol)
-        #             self.b[player][seq] += rew
+        #             old_pol = np.clip(old_pol, a_min=np.finfo(float).eps, a_max=None)
+        #             sum_vals += -pol * np.log(pol / old_pol)
+        #             # vals.append(-pol * np.log(pol / old_pol))
+        #             # max_val = max(max_val, self.b[player][seq])
+        #         for i, seq in enumerate(self.game.seqs[player][infoset_id]):
+        #             self.b[player][seq] += -KL * sum_vals
+        #             if self.b_count >= self.b_count_count_at[0]:
+        #                 self.b_store[player] += -KL * sum_vals
+                    # print(-KL * sum_vals)
+
+        if self.last_stgy[player] != None:
+            vals = []
+            u = 0.0
+            for infoset_id in self.visited[player][::-1]:
+                sum_vals = 0.0
+                max_val = 1e-100
+                for i, seq in enumerate(self.game.seqs[player][infoset_id]):
+                    pol = self.stgy[player][infoset_id][i]
+                    ref_pol = self.last_stgy[player][infoset_id][i]
+                    pol = np.clip(pol, a_min=np.finfo(float).eps, a_max=None)
+                    ref_pol = np.clip(ref_pol, a_min=np.finfo(float).eps, a_max=None)
+                    rew = u*(ref_pol - pol) # (KL / pol) *
+                    self.b[player][seq] += self.eta * rew
 
 
 
         # self.b[player] -= self.last_entropy[player]
         # self.last_entropy[player] = entropy[player].copy()
 
-        optimistic_gradient = self.opt[player] * self.grad[player] - self.last_opt[player] * self.last_gradient[player]
+        optimistic_gradient = self.opt[player] * (self.grad[player] / 1.0) - self.last_opt[player] * (self.last_gradient[player] / 1.0)
         # optimistic_gradient = 1.0 * self.grad[player] #- 0.5 * self.last_gradient[player] - 0.5*self.last_last_gradient[player]
         # print(optimistic_gradient)
         # if player == 0:
@@ -544,15 +553,17 @@ class LazyCFR:
 
         self.b[player] += self.eta * optimistic_gradient
 
-        if self.b_count >= self.b_count_count_at[0]:
+        # for infoset_id in self.visited[player][::-1]:
+        #     for i, seq in enumerate(self.game.seqs[player][infoset_id]):
+        #         self.b_tally[player][seq] += 1
+        #         if self.b_tally[player][seq] >= 8:
+        #             self.b_store[player][seq] += self.eta * optimistic_gradient[seq]
+
+        if self.b_count > self.b_count_count_at[0]:
             self.b_store[player] += self.eta * optimistic_gradient
 
-
         self.last_opt[player] = self.opt[player] - 1.0
-        self.last_stgy[player] = copy.deepcopy(self.stgy[player])
-        # if player == 0:
-        #     self.opt_levels.append(self.opt[0])
-
+        # self.last_stgy[player] = copy.deepcopy(self.stgy[player])
 
         y = np.zeros(self.total_seqs[player] + 1)
         for infoset_id in self.visited[player][::-1]:
@@ -664,7 +675,7 @@ class LazyCFR:
 
         # Might be able to get this down to times 1
         # But this doesn't bring it down that much - most nodes are in histories not visited infosets
-        self.nodestouched += len(self.visited[player][::-1]) * 2
+        self.nodestouched += len(self.visited[player][::-1]) * 1
 
         # for infoset_id in self.visited[player][::-1]:        #self.game.infoSets[player][::-1]:
         #     for seq in self.game.seqs[player][infoset_id]:
