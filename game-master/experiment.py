@@ -408,7 +408,7 @@ algo="lazycfr_nocomments"
 # res = run(game, Type=Type, solvername=algo)
 # its0 = res[5]
 # plots0 = res[6]
-
+force = 1
 algo="lazycfr_nocomments"
 game = Game( bidmaximum =betm) #path=savepath+".npz")#bidmaximum=betmpath=
 # game = KuhnGame( bidmaximum =betm)
@@ -424,6 +424,7 @@ params["final_exploit"] = 1e-12
 params["new_b"] = True
 params["b_count"] = [20] # Set to negative to disable
 params["b_count_count_at"] = [10]
+print("FINAL: USING THESE")
 print(params)
 res = run(game, Type=Type, solvername=algo)
 its1 = res[5]
