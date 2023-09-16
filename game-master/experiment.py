@@ -393,7 +393,7 @@ algo="lazycfr_nocomments"
 game = Game( bidmaximum =betm)
 # game = KuhnGame( bidmaximum =betm)
 params = {}
-params["AMMO"] = 50000
+params["AMMO"] = 500000
 params["optimism"] = 2.0
 params["entropy"] = 0
 params["KL"] = 0
@@ -413,7 +413,7 @@ algo="lazycfr_nocomments"
 game = Game( bidmaximum =betm) #path=savepath+".npz")#bidmaximum=betmpath=
 # game = KuhnGame( bidmaximum =betm)
 params = {}
-params["AMMO"] = 50000
+params["AMMO"] = 500000
 params["optimism"] = 2.0
 params["entropy"] = 0 #-1
 params["KL"] = 0
