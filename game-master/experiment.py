@@ -388,6 +388,7 @@ def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 # eta=20 22/7 thres=0.008 1,873,053
 
 
+d = 0
 betm = 6
 algo="lazycfr_nocomments"
 game = Game( bidmaximum =betm)
