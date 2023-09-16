@@ -388,27 +388,27 @@ def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 # eta=20 22/7 thres=0.008 1,873,053
 
 
-betm = 6
+betm = 7
 algo="lazycfr_nocomments"
-# game = Game( bidmaximum =betm)
-# # game = KuhnGame( bidmaximum =betm)
-# params = {}
-# params["AMMO"] = 50000
-# params["optimism"] = 2.0
-# params["entropy"] = 0
-# params["KL"] = 0
-# params["KL_mod"] = 10000
-# params["thres"] = -1.0
-# params["eta"] = 1.0 # try 10 20
-# params["final_exploit"] = 1e-12
-# params["new_b"] = False
-# params["b_count"] = [20] # Set to negative to disable
-# params["b_count_count_at"] = [8]
-# print(params)
-# res = run(game, Type=Type, solvername=algo)
-# its0 = res[5]
-# plots0 = res[6]
-force = 1
+game = Game( bidmaximum =betm)
+# game = KuhnGame( bidmaximum =betm)
+params = {}
+params["AMMO"] = 50000
+params["optimism"] = 2.0
+params["entropy"] = 0
+params["KL"] = 0
+params["KL_mod"] = 10000
+params["thres"] = 0.001
+params["eta"] = 20.0 # try 10 20
+params["final_exploit"] = 1e-12
+params["new_b"] = True
+params["b_count"] = [20] # Set to negative to disable
+params["b_count_count_at"] = [10]
+print(params)
+res = run(game, Type=Type, solvername=algo)
+its0 = res[5]
+plots0 = res[6]
+
 algo="lazycfr_nocomments"
 game = Game( bidmaximum =betm) #path=savepath+".npz")#bidmaximum=betmpath=
 # game = KuhnGame( bidmaximum =betm)
@@ -418,8 +418,8 @@ params["optimism"] = 2.0
 params["entropy"] = 0 #-1
 params["KL"] = 0
 params["KL_mod"] = 10000
-params["thres"] = 0.1
-params["eta"] = 1.0 #1.0
+params["thres"] = 0.01
+params["eta"] = 20.0 #1.0
 params["final_exploit"] = 1e-12
 params["new_b"] = True
 params["b_count"] = [20] # Set to negative to disable
@@ -470,7 +470,7 @@ plots1 = res[6]
 # different values of thres
 # different values of b_count
 
-# plt.plot(its0, plots0, 'b-', label='KOMWU_05')
+plt.plot(its0, plots0, 'b-', label='KOMWU_05')
 plt.plot(its1, plots1, 'r-', label='KOMWU_06')
 # plt.plot(its2, plots2, 'g-', label='KOMWU_07')
 # plt.plot(its3, plots3, 'm-', label='KOMWU_08')
