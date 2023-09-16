@@ -388,7 +388,7 @@ def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 # eta=20 22/7 thres=0.008 1,873,053
 
 
-betm = 7
+betm = 6
 algo="lazycfr_nocomments"
 game = Game( bidmaximum =betm)
 # game = KuhnGame( bidmaximum =betm)
@@ -398,7 +398,7 @@ params["optimism"] = 2.0
 params["entropy"] = 0
 params["KL"] = 0
 params["KL_mod"] = 10000
-params["thres"] = 0.001
+params["thres"] = 0.005
 params["eta"] = 20.0 # try 10 20
 params["final_exploit"] = 1e-12
 params["new_b"] = True
@@ -418,7 +418,7 @@ params["optimism"] = 2.0
 params["entropy"] = 0 #-1
 params["KL"] = 0
 params["KL_mod"] = 10000
-params["thres"] = 0.01
+params["thres"] = 0.008
 params["eta"] = 20.0 #1.0
 params["final_exploit"] = 1e-12
 params["new_b"] = True
