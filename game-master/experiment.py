@@ -402,7 +402,7 @@ params["KL_mod"] = 10000
 params["thres"] = 0.006
 params["eta"] = 20.0 # try 10 20
 params["final_exploit"] = 1e-12
-params["new_b"] = True
+params["new_b"] = False
 params["b_count"] = [20] # Set to negative to disable
 params["b_count_count_at"] = [10]
 print(params)
@@ -419,7 +419,7 @@ params["optimism"] = 2.0
 params["entropy"] = 0 #-1
 params["KL"] = 0
 params["KL_mod"] = 10000
-params["thres"] = 0.007
+params["thres"] = -0.006
 params["eta"] = 20.0 #1.0
 params["final_exploit"] = 1e-12
 params["new_b"] = True
