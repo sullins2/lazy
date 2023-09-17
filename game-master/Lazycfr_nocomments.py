@@ -382,6 +382,9 @@ class LazyCFR:
         self.b_count += 1
         if self.b_count == self.b_count_check[0] and self.new_b:
             self.b = self.b_store.copy()
+            # self.b[0] *= 0.95
+            # self.b[1] *= 0.95
+
             self.b_count = 1
             if len(self.b_count_check) > 1:
                 self.b_count_check.pop(0)
