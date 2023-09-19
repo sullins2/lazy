@@ -387,9 +387,24 @@ def run(game, path="result", Type="regretmatching", solvername = "cfr"):
 # eta=20 20/6 thres=0.008 1,932,594
 # eta=20 22/7 thres=0.008 1,873,053
 
+# leduc 4
+# reg               4858162
+# only new bs       2588365
+# only lazy 0.1     4105656
+# new bs lazy 0.1   2946664
+# new bslazy 0.009  1253234
+# new bs lazy 0.01  1194900
+# new bs lazy 0.02  1487037
+# new bs lazy 0.03  1541306
+# new bs lazy 0.04  1629562
+# new bs lazy 0.05  1930112
+# new bs lazy 0.06  1182437
+# new bs lazy 0.07  1596811
+# new bs lazy 0.08  1921419
 
-d = 1
-betm = 6
+
+
+betm = 5
 algo="lazycfr_nocomments"
 game = Game( bidmaximum =betm)
 # game = KuhnGame( bidmaximum =betm)
@@ -399,12 +414,12 @@ params["optimism"] = 2.0
 params["entropy"] = 0
 params["KL"] = 0
 params["KL_mod"] = 10000
-params["thres"] = -0.006
+params["thres"] = 0.02
 params["eta"] = 20.0 # try 10 20
 params["final_exploit"] = 1e-12
-params["new_b"] = True
-params["b_count"] = [10] # Set to negative to disable
-params["b_count_count_at"] = [5]
+params["new_b"] = False
+params["b_count"] = [20] # Set to negative to disable
+params["b_count_count_at"] = [10]
 print(params)
 res = run(game, Type=Type, solvername=algo)
 its0 = res[5]
@@ -419,12 +434,12 @@ params["optimism"] = 2.0
 params["entropy"] = 0 #-1
 params["KL"] = 0
 params["KL_mod"] = 10000
-params["thres"] = -0.006
+params["thres"] = 0.05
 params["eta"] = 20.0 #1.0
 params["final_exploit"] = 1e-12
 params["new_b"] = True
-params["b_count"] = [4] # Set to negative to disable
-params["b_count_count_at"] = [2]
+params["b_count"] = [20] # Set to negative to disable
+params["b_count_count_at"] = [10]
 print("FINAL: USING THESE")
 print(params)
 res = run(game, Type=Type, solvername=algo)
@@ -439,12 +454,12 @@ plots1 = res[6]
 # params["entropy"] = 0
 # params["KL"] = 0
 # params["KL_mod"] = 10000
-# params["thres"] = 0.11
-# params["eta"] = 1.0 #1.0
+# params["thres"] = 0.009
+# params["eta"] = 20.0 #1.0
 # params["final_exploit"] = 1e-12
-# params["new_b"] = False
-# params["b_count"] = [10] #36 # Set to negative to disable
-# params["b_count_count_at"] = [5] #15
+# params["new_b"] = True
+# params["b_count"] = [20] #36 # Set to negative to disable
+# params["b_count_count_at"] = [10] #15
 # print(params)
 # res = run(game, Type=Type, solvername=algo)
 # its2 = res[5]
@@ -457,8 +472,8 @@ plots1 = res[6]
 # params["entropy"] = 0
 # params["KL"] = 0
 # params["KL_mod"] = 10000
-# params["thres"] = 0.12
-# params["eta"] = 1.0 #1.0
+# params["thres"] = -10.03
+# params["eta"] = 20.0 #1.0
 # params["final_exploit"] = 1e-12
 # params["new_b"] = False
 # params["b_count"] = [20] #36 # Set to negative to disable
@@ -478,12 +493,11 @@ plt.plot(its1, plots1, 'r-', label='KOMWU_06')
 plt.xlabel('Nodes Touched')
 plt.ylabel('Exploitability')
 # Set the axis scale to logarithmic
-plt.xscale('log')
+# plt.xscale('log')
 plt.yscale('log')
 # Set the axis limits
-plt.xlim(5, 1e9)  # x-axis limits from 1 to 100000 (10^5)
-plt.ylim(1e-20, 1)  # y-axis limits from 10^-12 to 1
-# plt.ylim(0.0, 1.0)  # Set y-axis range
+# plt.xlim(1e5, 1e9)  # x-axis limits from 1 to 100000 (10^5)
+# plt.ylim(1e-20, 1)  # y-axis limits from 10^-12 to 1
 plt.legend()
 plt.show()
 
